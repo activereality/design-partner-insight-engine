@@ -1,6 +1,6 @@
 # SignalForge Web
 
-Minimal Vite + React + TypeScript frontend shell for SignalForge, the Design Partner Insight Engine.
+Vite + React + TypeScript frontend for SignalForge, the Design Partner Insight Engine.
 
 ## Commands
 
@@ -15,6 +15,9 @@ Minimal Vite + React + TypeScript frontend shell for SignalForge, the Design Par
 
 - `/`
 - `/projects`
+- `/projects/new`
+- `/projects/:projectId`
+- `/projects/:projectId/notes/:noteId`
 
 ## Configuration
 
@@ -29,11 +32,10 @@ Copy `.env.example` to `.env` for local overrides if needed. Never put backend s
 - The health check displays safe status fields only.
 - Raw backend errors, stack traces, connection strings, provider responses, and secrets are not shown.
 - Do not enter or commit real customer notes, private interview details, recruiter messages, employer data, or private Gitwit/Mechro details.
+- Project and note forms are for synthetic/demo content only.
 
 ## Intentionally Not Implemented Yet
 
-- Project CRUD UI
-- Notes UI
 - Insight review UI
 - Dashboard UI
 - Authentication

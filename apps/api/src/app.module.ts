@@ -4,6 +4,8 @@ import { MongooseModule, type MongooseModuleOptions } from '@nestjs/mongoose';
 
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { NotesModule } from './notes/notes.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { HealthModule } from './health/health.module';
         serverSelectionTimeoutMS: 5000
       })
     }),
-    HealthModule
+    HealthModule,
+    ProjectsModule,
+    NotesModule
   ]
 })
 export class AppModule {}

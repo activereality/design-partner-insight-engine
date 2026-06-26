@@ -95,15 +95,17 @@ Suggested commit: `feat(web): add react app shell`
 
 ## 6. Projects And Notes CRUD
 
+Status: completed as the first product-domain workflow foundation.
+
 Goal: create and view projects and notes.
 
-Scope: REST endpoints and UI forms/lists.
+Scope: project and note Mongoose schemas, DTOs, REST endpoints, route param validation, and UI forms/lists/detail views.
 
-Out of scope: extraction.
+Out of scope: AI extraction, extraction runs, insight items, dashboard aggregation, auth, seed/reset, file upload, transcription, and search.
 
 Likely files: API project/note modules, web project/note pages.
 
-Verification: create/list/read flows work with synthetic data.
+Verification: create/list/read/update flows work with synthetic data, and note delete is available through the API.
 
 Security notes: validate DTOs on the backend, scope reads/writes by project ID, and do not trust client-provided ownership fields.
 Security verification: invalid ObjectIds and overlarge text fail safely, project-scoped queries are used, raw notes are not logged, and API responses use safe DTOs.

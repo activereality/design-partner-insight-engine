@@ -1,6 +1,6 @@
 # SignalForge API
 
-Minimal NestJS + TypeScript API shell for SignalForge, the Design Partner Insight Engine.
+NestJS + TypeScript API for SignalForge, the Design Partner Insight Engine.
 
 ## Commands
 
@@ -53,20 +53,38 @@ Expected response:
 }
 ```
 
+## Project And Note Endpoints
+
+Projects:
+
+- `GET /api/projects`
+- `POST /api/projects`
+- `GET /api/projects/:projectId`
+- `PATCH /api/projects/:projectId`
+
+Research notes:
+
+- `GET /api/projects/:projectId/notes`
+- `POST /api/projects/:projectId/notes`
+- `GET /api/notes/:noteId`
+- `PATCH /api/notes/:noteId`
+- `DELETE /api/notes/:noteId`
+
+Notes are created and listed through the route `projectId`; the client does not provide or control note ownership scope.
+
 ## Security Notes
 
 - Global validation is enabled for future DTO-based endpoints.
+- Project and note DTOs validate required fields, lengths, enums, dates, and ObjectId route params.
 - Environment values are validated at startup.
 - Database configuration stays server-side.
 - The app should not log request bodies, raw notes, prompts, provider responses, or secrets.
 - API responses should stay sanitized and avoid connection strings, stack traces, internal DB errors, or debug payloads.
-- Future product modules should scope data access by project ID.
+- Note list/create access is project-scoped so future workspace/user authorization can be added cleanly.
 
 ## Intentionally Not Implemented Yet
 
-- Product/domain modules
-- Projects, notes, insights, or extraction endpoints
+- Insights, extraction runs, or dashboard endpoints
 - AI provider abstraction or provider packages
 - Auth
 - Seed data
-- React frontend

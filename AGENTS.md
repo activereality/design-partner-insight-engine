@@ -30,7 +30,7 @@ SignalForge turns messy founder, customer, and design-partner notes into structu
 - Mock AI provider first
 - OpenAI provider later
 - Leave room for Anthropic and Gemini providers later
-- Docker Compose later for local MongoDB
+- Docker Compose for local MongoDB
 - GitHub Actions later for CI
 
 ## Product Boundary
@@ -92,4 +92,4 @@ Future slices should include the most relevant checks for the touched surface: l
 
 ## Current Scaffold
 
-This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a minimal NestJS API shell, MongoDB/Mongoose connection infrastructure, and a minimal Vite React frontend shell. Do not add product/domain logic, product workflow UI, CI files, auth, seed data, or AI provider code until explicitly requested.
+This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a NestJS API with MongoDB/Mongoose and projects/notes CRUD, and a Vite React frontend with projects/notes workflow screens. Do not add AI extraction, insight review, dashboard aggregation, CI files, auth, seed data, or AI provider code until explicitly requested.

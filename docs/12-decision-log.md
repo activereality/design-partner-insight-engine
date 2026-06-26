@@ -190,3 +190,16 @@ Consequences:
 - The frontend has `/` and `/projects` routes only.
 - The health check uses a direct `fetch` and safe display fields; TanStack Query remains deferred.
 - Frontend configuration is limited to public-safe `VITE_*` values.
+
+## ADR 027: Project-Scoped Projects And Notes Foundation
+
+Decision: implement projects and raw research notes as the first product-domain workflow, with notes created and listed through project-scoped routes.
+
+Rationale: projects and notes are the smallest useful discovery workflow and establish the future authorization boundary before AI extraction or dashboards are added.
+
+Consequences:
+
+- Project and note inputs use explicit DTOs, enums, ObjectId validation, and bounded text fields.
+- `ResearchNote.rawText` is returned only for the note workflow and remains treated as sensitive by design.
+- Clients do not provide note ownership or project scope fields during note creation.
+- AI extraction, insights, dashboard aggregation, auth, seed/reset, and provider code remain deferred.

@@ -35,10 +35,10 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - Mock AI provider first
 - OpenAI provider later
 - Future-ready for Anthropic and Gemini
-- Docker Compose later for local MongoDB
+- Docker Compose for local MongoDB
 - GitHub Actions later for CI
 
-The API and frontend shells now exist. Product workflows, seed data, AI extraction, auth, and dashboard experiences are still deferred.
+The API and frontend now support a small projects-and-notes workflow. Seed data, AI extraction, auth, and dashboard experiences are still deferred.
 
 ## Local Setup
 
@@ -50,24 +50,21 @@ Current tooling scaffold:
 4. Run `pnpm install` after cloning.
 5. For local API development, copy `apps/api/.env.example` to `apps/api/.env` and keep `.env` uncommitted.
 6. Start local MongoDB with `docker compose up -d`.
-7. API shell commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
+7. API commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
 8. The API health check is `GET http://localhost:3000/api/health`.
-9. Frontend shell commands are available with `pnpm --filter @signalforge/web dev`, `pnpm --filter @signalforge/web build`, and `pnpm --filter @signalforge/web typecheck`.
+9. Frontend commands are available with `pnpm --filter @signalforge/web dev`, `pnpm --filter @signalforge/web build`, and `pnpm --filter @signalforge/web typecheck`.
 10. The frontend runs at `http://127.0.0.1:5173` by default.
 
 ## Demo Flow
 
 1. Create a product discovery project.
 2. Paste or load synthetic messy design-partner notes.
-3. Run extraction with the mock AI provider.
-4. Review evidence-backed insights.
-5. Edit, accept, reject, or mark insights for follow-up.
-6. View the dashboard summary.
-7. Decide what to build now, what to learn more about, and what to ignore.
+3. Review the project and note detail pages.
+4. Later slices will add mock extraction, evidence-backed insight review, and dashboard summaries.
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current API shell connects to local MongoDB for infrastructure health only, and the current web shell verifies routing, layout, and safe API health visibility. Product data models and workflows are still deferred.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current implementation connects to local MongoDB and supports project-scoped synthetic projects and raw research notes. AI extraction, insight review, dashboard aggregation, and seed/reset flows are still deferred.
 
 The intended structure is documented, not created yet.
 

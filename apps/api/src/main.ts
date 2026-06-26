@@ -15,7 +15,7 @@ async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    methods: ['GET', 'HEAD', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
     origin: [/^http:\/\/localhost:5173$/, /^http:\/\/127\.0\.0\.1:5173$/]
   });
   app.enableVersioning({
