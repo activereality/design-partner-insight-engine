@@ -14,7 +14,7 @@ Do not add full authentication, authorization roles, billing security, SOC2 cont
 
 - Public: README, docs, synthetic screenshots, synthetic demo scenarios.
 - Internal application data: project names, tags, review statuses, dashboard summaries.
-- Sensitive by design: raw research notes, evidence quotes, AI prompts, provider responses, extracted insight payloads, failure diagnostics.
+- Sensitive by design: raw research notes, evidence quotes, AI prompts, provider responses, extracted insight payloads, and failure details.
 - Secret: provider API keys, tokens, credentials, private connection strings.
 
 ## Synthetic/Demo Data Policy

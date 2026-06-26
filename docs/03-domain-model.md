@@ -1,6 +1,6 @@
 # Domain Model
 
-This model uses MongoDB/Mongoose document language. It is a planned model, not an implemented schema.
+This model uses MongoDB/Mongoose document language. It is a planned model, not an implemented schema. See [Security and Privacy](13-security-and-privacy.md) for the broader data-handling posture.
 
 ## Project
 

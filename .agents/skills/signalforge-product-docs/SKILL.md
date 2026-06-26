@@ -17,7 +17,7 @@ Docs should define the intended product behavior before implementation. Keep pro
 
 Stay focused on startup/product discovery and design-partner insight synthesis. Do not introduce industrial maintenance, equipment troubleshooting, manuals, CMMS, technician copilot, diagnostics, field service, PlantBrain, or Tenzin concepts.
 
-## Docs To Add Later
+## Docs To Maintain
 
 - product brief
 - insight schema reference
@@ -25,6 +25,7 @@ Stay focused on startup/product discovery and design-partner insight synthesis. 
 - API contract notes
 - AI extraction behavior notes
 - interview demo script
+- security and privacy guidance
 
 ## Tone
 

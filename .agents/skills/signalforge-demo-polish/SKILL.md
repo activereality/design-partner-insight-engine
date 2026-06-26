@@ -19,7 +19,7 @@ Future demo reset behavior should restore a predictable scenario quickly. Keep r
 
 ## README And Screenshots
 
-The README should eventually explain the problem, demo flow, stack, AI abstraction, mock-provider path, and how to run the app. Screenshots should show the actual product workflow, not placeholder marketing sections.
+Keep the README aligned with the problem, demo flow, stack, AI abstraction, mock-provider path, security posture, and run instructions once app scaffolding exists. Screenshots should show the actual product workflow, not placeholder marketing sections.
 
 ## Interview Demo Flow
 
