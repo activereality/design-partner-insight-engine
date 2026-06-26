@@ -1,0 +1,137 @@
+# Security And Privacy
+
+## Purpose
+
+This document defines the security-forward and privacy-aware design posture for SignalForge. The current project is docs-first and synthetic-data-only, but future implementation should avoid choices that create avoidable security retrofits.
+
+## Security Posture
+
+SignalForge is a local-first portfolio artifact for now. It should still be designed as if raw discovery notes may become sensitive customer data later. Security work should be practical: validate inputs, keep secrets server-side, sanitize responses, avoid unsafe logging, and document MVP tradeoffs.
+
+Do not add full authentication, authorization roles, billing security, SOC2 controls, encryption infrastructure, enterprise audit logging, or deployment security implementation in the MVP.
+
+## Data Classification
+
+- Public: README, docs, synthetic screenshots, synthetic demo scenarios.
+- Internal application data: project names, tags, review statuses, dashboard summaries.
+- Sensitive by design: raw research notes, evidence quotes, AI prompts, provider responses, extracted insight payloads, failure diagnostics.
+- Secret: provider API keys, tokens, credentials, private connection strings.
+
+## Synthetic/Demo Data Policy
+
+Only synthetic/demo data belongs in the public repo. Do not commit real customer notes, private Gitwit or Mechro details, interview/recruiter content, employer data, private notes, secrets, API keys, tokens, credentials, or copied customer material.
+
+## Sensitive Fields By Domain Document
+
+Project:
+
+- `name` and `description` may become sensitive if users enter private product context.
+
+ResearchNote:
+
+- `rawText` is sensitive and should not be logged by default.
+- `title` and `tags` may contain sensitive context and should be treated carefully.
+
+ExtractionRun:
+
+- `rawResponse` is sensitive/internal and should not be exposed to the frontend by default.
+- `errorMessage` should be sanitized.
+
+InsightItem:
+
+- `payload` is potentially sensitive and should be internal unless explicitly mapped to a safe DTO.
+- `evidence` is potentially sensitive because quotes can contain raw note language.
+- `summary` and `title` may reveal sensitive product direction.
+
+## Raw Notes Handling
+
+Raw notes should be accepted only through validated backend DTOs. Do not log full note text by default. Responses should return only the fields needed for the current review workflow and should remain scoped to the project.
+
+## AI Prompt And Provider-Response Handling
+
+Prompts and provider responses may contain sensitive user data. Real provider calls must stay server-side. Provider keys must never be sent to the frontend. Raw provider responses should be normalized and validated before persistence or display.
+
+Persisting raw provider responses is a local/debug-only option and must be revisited before deployment.
+
+## Logging Policy
+
+Avoid logging:
+
+- raw note contents
+- AI prompts
+- provider responses
+- API keys
+- tokens
+- credentials
+- internal stack traces in user-facing responses
+
+Local debug logging may be temporarily enabled for synthetic data only and should be intentionally scoped.
+
+## Validation Policy
+
+Backend validation is required even when the UI validates. Prefer explicit DTOs, schemas, enums, ObjectId validation, and bounded text fields over loose untyped objects.
+
+Invalid inputs should fail with clear, safe messages. Do not leak implementation details.
+
+## Environment Configuration Policy
+
+Use environment variables for configuration that differs by environment. Add `.env.example` only when configuration is introduced. Never commit `.env`.
+
+Provider keys, connection strings, and credentials stay server-side.
+
+## Frontend/Backend Boundary
+
+The frontend should call typed API endpoints and receive safe DTOs. It should not receive provider secrets, raw provider responses, internal debug payloads, stack traces, or server-only configuration.
+
+## MongoDB Data-Access Expectations
+
+MongoDB/Mongoose queries should be scoped by `projectId` for project-owned resources. Do not trust client-provided ownership fields. Derive ownership relationships from route parameters and server-side lookups.
+
+## Future Auth/Authorization Readiness
+
+Auth is out of MVP, but APIs should be shaped so workspace/user authorization can be added later. Project-scoped routes and service methods are the main readiness mechanism.
+
+## Future Rate Limiting Readiness
+
+Rate limiting is out of MVP. Future external provider calls and write-heavy endpoints should have a natural place to add per-user, per-workspace, or per-project limits.
+
+## Future Audit/Event Logging Readiness
+
+Enterprise audit logging is out of MVP. Future event logging should record safe metadata such as actor, project ID, action, timestamp, and result without storing raw notes, prompts, or provider responses in general logs.
+
+## Local Development Assumptions
+
+- Synthetic data only.
+- Mock AI provider default.
+- No real provider keys required.
+- No `.env` committed.
+- Debug output remains minimal by default.
+
+## Future Deployment Assumptions
+
+Before deployment with non-demo data, add authentication, authorization, rate limiting, managed secrets, production-safe logging, data retention decisions, and a review of raw provider-response persistence.
+
+## Known MVP Security Tradeoffs
+
+- No authentication in MVP.
+- No role-based authorization in MVP.
+- No production audit logging in MVP.
+- No deployment secrets implementation in MVP.
+- No rate limiting in MVP.
+- Raw response persistence may exist only for local/debug and must be revisited before deployment.
+
+These are intentional tradeoffs because the MVP is local and synthetic-data-only.
+
+## Security Checklist For Future Slices
+
+- Confirm no secrets, API keys, tokens, credentials, private notes, or real customer data are committed.
+- Confirm no `.env` is added.
+- Add `.env.example` only when configuration is introduced.
+- Keep mock provider working without API keys.
+- Keep provider keys server-side only.
+- Validate backend inputs with DTOs, schemas, enums, and bounded fields.
+- Scope data access by project ID.
+- Avoid trusting client-provided ownership fields.
+- Avoid logging raw notes, prompts, provider responses, or secrets.
+- Return sanitized errors to the frontend.
+- Do not expose raw provider responses or internal debug payloads by default.

@@ -1,0 +1,120 @@
+# Decision Log
+
+## ADR 001: Public Name And Codename
+
+Decision: use Design Partner Insight Engine as the public project name and SignalForge as the working codename.
+
+Rationale: the public name is explicit for portfolio readers, while the codename gives the project a concise internal identity.
+
+## ADR 002: React + TypeScript Frontend
+
+Decision: use React + TypeScript for the future frontend.
+
+Rationale: it is a strong fit for a product workflow demo with typed API contracts and reusable review components.
+
+## ADR 003: NestJS + TypeScript Backend
+
+Decision: use NestJS + TypeScript for the future backend.
+
+Rationale: it provides clear module, controller, service, DTO, and validation patterns for a portfolio-quality API.
+
+## ADR 004: MongoDB + Mongoose
+
+Decision: use MongoDB + Mongoose for persistence.
+
+Rationale: discovery notes, evidence snippets, draft insights, and evolving extraction metadata are document-shaped.
+
+## ADR 005: AI Provider Abstraction
+
+Decision: place AI calls behind a provider interface.
+
+Rationale: the app can support mock output first, OpenAI later, and Anthropic/Gemini when useful without changing product workflow code.
+
+## ADR 006: Mock AI First
+
+Decision: build the mock provider before external providers.
+
+Rationale: deterministic synthetic output makes demos, tests, and UI development reliable.
+
+## ADR 007: OpenAI Later
+
+Decision: add OpenAI after the mock workflow, schema validation, and review loop are working.
+
+Rationale: provider integration should not obscure the core product experience.
+
+## ADR 008: Synthetic Demo Data Only
+
+Decision: use synthetic/demo data only.
+
+Rationale: the artifact should be safe to share and must not expose private notes, customer data, interviews, recruiter content, secrets, API keys, tokens, or credentials.
+
+## ADR 009: No Auth In MVP
+
+Decision: omit auth from the MVP.
+
+Rationale: the first version is a local portfolio demo with synthetic data. Auth can wait until there is a real multi-user need.
+
+## ADR 010: No Queue In MVP
+
+Decision: omit background queues from the MVP.
+
+Rationale: mock extraction can run synchronously. A queue can be added later if provider calls become slow or asynchronous.
+
+## ADR 011: No Industrial Maintenance Or Troubleshooting Scope
+
+Decision: exclude industrial maintenance workflows, equipment troubleshooting, machinery, manuals, manual search, parts search, technician copilots, CMMS, diagnostics, field service, PlantBrain overlap, and Tenzin overlap.
+
+Rationale: SignalForge must stay focused on startup/product discovery and design-partner insight synthesis.
+
+## ADR 012: Security-Forward Local MVP
+
+Decision: build local-only slices with future deployment readiness in mind, without adding full authentication, authorization roles, audit logging, encryption-at-rest configuration, billing security, SOC2 controls, or enterprise compliance in the MVP.
+
+Rationale: the artifact should stay small and demoable, but avoid shortcuts that would make deployment harder later.
+
+Consequences:
+
+- Backend input validation is required even when the UI validates.
+- DTOs, schemas, enums, and bounded fields are preferred over loose shapes.
+- Data access should be scoped by project ID.
+- Client-provided ownership fields should not be trusted.
+- Secrets and provider keys stay server-side in environment variables.
+- `.env.example` is added only when configuration is introduced; `.env` is never committed.
+- Errors returned to the frontend are sanitized.
+- Raw notes, prompts, API keys, and full AI responses are not logged by default.
+
+## ADR 013: Security-Forward Docs-First Approach
+
+Decision: document security and privacy expectations before application scaffolding.
+
+Rationale: early data and API decisions are cheaper to shape now than to retrofit later.
+
+## ADR 014: Raw Notes Are Sensitive By Design
+
+Decision: treat `ResearchNote.rawText` as sensitive even when the current repo contains only synthetic data.
+
+Rationale: the same field could later hold customer discovery input, so logging, API responses, and access patterns should be designed carefully from the start.
+
+## ADR 015: AI Provider Keys Stay Server-Side
+
+Decision: keep AI provider keys and provider-specific configuration server-side only.
+
+Rationale: frontend exposure would make secrets difficult to protect and rotate.
+
+## ADR 016: No Auth In MVP, Project-Scoped Access Now
+
+Decision: defer auth in the MVP but design data access around project-scoped routes and queries.
+
+Rationale: project scoping creates a clean boundary for future workspace/user authorization without requiring a rewrite.
+
+## ADR 017: No Raw Provider Responses To Frontend
+
+Decision: raw provider responses and internal debug payloads should not be exposed to frontend responses by default.
+
+Rationale: provider responses may contain sensitive source data, prompts, or implementation details.
+
+## ADR 018: Safe Logging Policy
+
+Decision: avoid logging raw notes, prompts, provider responses, API keys, tokens, credentials, and internal traces by default.
+
+Rationale: logs are easy to over-share during demos and deployment, so they should contain safe metadata unless local synthetic debugging is intentionally enabled.
