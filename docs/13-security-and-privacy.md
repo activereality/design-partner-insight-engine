@@ -45,7 +45,7 @@ InsightItem:
 
 ## Raw Notes Handling
 
-Raw notes should be accepted only through validated backend DTOs. Do not log full note text by default. Responses should return only the fields needed for the current review workflow and should remain scoped to the project.
+Raw notes should be accepted only through validated backend DTOs. Do not log full note text by default. List and create responses should return note summaries without full `rawText`; detail/edit responses may include full `rawText` only when the workflow needs it. Responses should remain scoped to the project.
 
 ## AI Prompt And Provider-Response Handling
 

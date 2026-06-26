@@ -1,7 +1,13 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { getResearchNote, noteSourceTypes, updateResearchNote, type NoteSourceType, type ResearchNote } from '../api/notes';
+import {
+  getResearchNote,
+  noteSourceTypes,
+  updateResearchNote,
+  type NoteSourceType,
+  type ResearchNoteDetail
+} from '../api/notes';
 
 interface NoteEditState {
   title: string;
@@ -17,7 +23,7 @@ function toDateInputValue(value: string): string {
 
 export function NoteDetailPage() {
   const { projectId, noteId } = useParams();
-  const [note, setNote] = useState<ResearchNote | null>(null);
+  const [note, setNote] = useState<ResearchNoteDetail | null>(null);
   const [form, setForm] = useState<NoteEditState | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');

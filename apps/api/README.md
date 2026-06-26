@@ -72,6 +72,8 @@ Research notes:
 
 Notes are created and listed through the route `projectId`; the client does not provide or control note ownership scope.
 
+Note list and create responses use a summary shape with no full `rawText`. They may include a short `rawTextPreview`. Note detail and update responses include full `rawText` for the edit workflow.
+
 ## Security Notes
 
 - Global validation is enabled for future DTO-based endpoints.
@@ -81,6 +83,7 @@ Notes are created and listed through the route `projectId`; the client does not 
 - The app should not log request bodies, raw notes, prompts, provider responses, or secrets.
 - API responses should stay sanitized and avoid connection strings, stack traces, internal DB errors, or debug payloads.
 - Note list/create access is project-scoped so future workspace/user authorization can be added cleanly.
+- Full raw note text is returned only by note detail/update endpoints that need it for editing.
 
 ## Intentionally Not Implemented Yet
 

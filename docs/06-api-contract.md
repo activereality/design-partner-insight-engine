@@ -1,6 +1,6 @@
 # API Contract
 
-This is the planned REST contract. No API code exists yet.
+This is the REST contract for the current and planned API surface.
 
 ## API Security Posture
 
@@ -62,6 +62,8 @@ MVP notes: future auth can filter project access at this boundary.
 
 Purpose: list research notes for a project.
 
+Response shape: array of note summaries. Summaries must not include full `rawText`; they may include a short `rawTextPreview` capped to a safe length.
+
 ### `POST /projects/:projectId/notes`
 
 Purpose: add a synthetic research note.
@@ -71,15 +73,32 @@ Request shape:
 ```json
 {
   "title": "Design partner call notes",
-  "sourceType": "design_partner_note",
+  "sourceType": "design_partner_call",
   "rawText": "Messy synthetic note text..."
 }
 ```
 
 Validation: title, source type, and raw text are required.
 DTO expectations: reject empty or overly large note text, unknown source types, and client-provided project ownership fields.
+Response shape: note summary without full `rawText`.
 
 MVP notes: do not log full note content by default.
+
+### `GET /notes/:noteId`
+
+Purpose: return research note detail for viewing/editing.
+
+Response shape: note detail including full `rawText`.
+
+### `PATCH /notes/:noteId`
+
+Purpose: update research note metadata or raw text.
+
+Response shape: note detail including full `rawText`, because the edit workflow needs the saved value.
+
+### `DELETE /notes/:noteId`
+
+Purpose: delete a research note without deleting its project.
 
 ## Extraction
 

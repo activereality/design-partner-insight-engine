@@ -17,10 +17,14 @@ export interface ResearchNote {
   title: string;
   sourceType: NoteSourceType;
   participantLabel: string;
-  rawText: string;
   occurredAt: string;
   createdAt: string;
   updatedAt: string;
+  rawTextPreview?: string;
+}
+
+export interface ResearchNoteDetail extends ResearchNote {
+  rawText: string;
 }
 
 export interface CreateResearchNoteInput {
@@ -47,15 +51,15 @@ export function createProjectNote(
   });
 }
 
-export function getResearchNote(noteId: string): Promise<ResearchNote> {
-  return requestJson<ResearchNote>(`/api/notes/${noteId}`);
+export function getResearchNote(noteId: string): Promise<ResearchNoteDetail> {
+  return requestJson<ResearchNoteDetail>(`/api/notes/${noteId}`);
 }
 
 export function updateResearchNote(
   noteId: string,
   input: UpdateResearchNoteInput
-): Promise<ResearchNote> {
-  return requestJson<ResearchNote>(`/api/notes/${noteId}`, {
+): Promise<ResearchNoteDetail> {
+  return requestJson<ResearchNoteDetail>(`/api/notes/${noteId}`, {
     body: JSON.stringify(input),
     method: 'PATCH'
   });

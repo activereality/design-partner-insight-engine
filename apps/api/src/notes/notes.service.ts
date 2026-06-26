@@ -5,7 +5,12 @@ import { Model, Types } from 'mongoose';
 import { ProjectsService } from '../projects/projects.service';
 import { CreateResearchNoteDto } from './dto/create-research-note.dto';
 import { UpdateResearchNoteDto } from './dto/update-research-note.dto';
-import { ResearchNoteResponse, toResearchNoteResponse } from './research-note.response';
+import {
+  ResearchNoteDetailResponse,
+  ResearchNoteSummaryResponse,
+  toResearchNoteDetailResponse,
+  toResearchNoteSummaryResponse
+} from './research-note.response';
 import { ResearchNote, ResearchNoteDocument } from './schemas/research-note.schema';
 
 @Injectable()
@@ -15,7 +20,7 @@ export class NotesService {
     private readonly projectsService: ProjectsService
   ) {}
 
-  async create(projectId: string, dto: CreateResearchNoteDto): Promise<ResearchNoteResponse> {
+  async create(projectId: string, dto: CreateResearchNoteDto): Promise<ResearchNoteSummaryResponse> {
     await this.projectsService.ensureExists(projectId);
 
     const note = await this.noteModel.create({
@@ -27,25 +32,25 @@ export class NotesService {
       occurredAt: new Date(dto.occurredAt)
     });
 
-    return toResearchNoteResponse(note);
+    return toResearchNoteSummaryResponse(note);
   }
 
-  async findByProject(projectId: string): Promise<ResearchNoteResponse[]> {
+  async findByProject(projectId: string): Promise<ResearchNoteSummaryResponse[]> {
     await this.projectsService.ensureExists(projectId);
 
     const notes = await this.noteModel
       .find({ projectId: new Types.ObjectId(projectId) })
       .sort({ occurredAt: -1 })
       .exec();
-    return notes.map(toResearchNoteResponse);
+    return notes.map(toResearchNoteSummaryResponse);
   }
 
-  async findOne(noteId: string): Promise<ResearchNoteResponse> {
+  async findOne(noteId: string): Promise<ResearchNoteDetailResponse> {
     const note = await this.findNoteDocument(noteId);
-    return toResearchNoteResponse(note);
+    return toResearchNoteDetailResponse(note);
   }
 
-  async update(noteId: string, dto: UpdateResearchNoteDto): Promise<ResearchNoteResponse> {
+  async update(noteId: string, dto: UpdateResearchNoteDto): Promise<ResearchNoteDetailResponse> {
     const update = { ...dto };
 
     if (dto.occurredAt) {
@@ -60,7 +65,7 @@ export class NotesService {
       throw new NotFoundException('Research note not found');
     }
 
-    return toResearchNoteResponse(note);
+    return toResearchNoteDetailResponse(note);
   }
 
   async delete(noteId: string): Promise<void> {

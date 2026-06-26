@@ -4,7 +4,7 @@ import { MongoObjectIdPipe } from '../common/pipes/mongo-object-id.pipe';
 import { CreateResearchNoteDto } from './dto/create-research-note.dto';
 import { UpdateResearchNoteDto } from './dto/update-research-note.dto';
 import { NotesService } from './notes.service';
-import { ResearchNoteResponse } from './research-note.response';
+import { ResearchNoteDetailResponse, ResearchNoteSummaryResponse } from './research-note.response';
 
 @Controller()
 export class NotesController {
@@ -13,7 +13,7 @@ export class NotesController {
   @Get('projects/:projectId/notes')
   findByProject(
     @Param('projectId', MongoObjectIdPipe) projectId: string
-  ): Promise<ResearchNoteResponse[]> {
+  ): Promise<ResearchNoteSummaryResponse[]> {
     return this.notesService.findByProject(projectId);
   }
 
@@ -21,12 +21,12 @@ export class NotesController {
   create(
     @Param('projectId', MongoObjectIdPipe) projectId: string,
     @Body() dto: CreateResearchNoteDto
-  ): Promise<ResearchNoteResponse> {
+  ): Promise<ResearchNoteSummaryResponse> {
     return this.notesService.create(projectId, dto);
   }
 
   @Get('notes/:noteId')
-  findOne(@Param('noteId', MongoObjectIdPipe) noteId: string): Promise<ResearchNoteResponse> {
+  findOne(@Param('noteId', MongoObjectIdPipe) noteId: string): Promise<ResearchNoteDetailResponse> {
     return this.notesService.findOne(noteId);
   }
 
@@ -34,7 +34,7 @@ export class NotesController {
   update(
     @Param('noteId', MongoObjectIdPipe) noteId: string,
     @Body() dto: UpdateResearchNoteDto
-  ): Promise<ResearchNoteResponse> {
+  ): Promise<ResearchNoteDetailResponse> {
     return this.notesService.update(noteId, dto);
   }
 
