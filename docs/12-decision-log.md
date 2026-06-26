@@ -89,31 +89,49 @@ Decision: document security and privacy expectations before application scaffold
 
 Rationale: early data and API decisions are cheaper to shape now than to retrofit later.
 
-## ADR 014: Raw Notes Are Sensitive By Design
+## ADR 014: Dedicated Security/Privacy Doc
+
+Decision: maintain a dedicated `docs/13-security-and-privacy.md` document.
+
+Rationale: future implementation prompts need a single practical reference for data sensitivity, logging, validation, frontend/backend boundaries, and MVP security tradeoffs.
+
+## ADR 015: Raw Notes Are Sensitive By Design
 
 Decision: treat `ResearchNote.rawText` as sensitive even when the current repo contains only synthetic data.
 
 Rationale: the same field could later hold customer discovery input, so logging, API responses, and access patterns should be designed carefully from the start.
 
-## ADR 015: AI Provider Keys Stay Server-Side
+## ADR 016: Insight Evidence Is Potentially Sensitive
+
+Decision: treat `InsightItem.evidence` and source-derived insight payloads as potentially sensitive.
+
+Rationale: evidence quotes can contain raw-note language and product context, so embedding evidence in MVP insight documents makes those documents source-derived records.
+
+## ADR 017: Demo Seed Data Fully Synthetic
+
+Decision: demo seed data and committed mock output must be fully synthetic.
+
+Rationale: the public repo should stay safe to share and should not contain real people, companies, employers, customer notes, recruiter messages, interview notes, or private company details.
+
+## ADR 018: AI Provider Keys Stay Server-Side
 
 Decision: keep AI provider keys and provider-specific configuration server-side only.
 
 Rationale: frontend exposure would make secrets difficult to protect and rotate.
 
-## ADR 016: No Auth In MVP, Project-Scoped Access Now
+## ADR 019: No Auth In MVP, Project-Scoped Access Now
 
 Decision: defer auth in the MVP but design data access around project-scoped routes and queries.
 
 Rationale: project scoping creates a clean boundary for future workspace/user authorization without requiring a rewrite.
 
-## ADR 017: No Raw Provider Responses To Frontend
+## ADR 020: No Raw Provider Responses To Frontend
 
 Decision: raw provider responses and internal debug payloads should not be exposed to frontend responses by default.
 
 Rationale: provider responses may contain sensitive source data, prompts, or implementation details.
 
-## ADR 018: Safe Logging Policy
+## ADR 021: Safe Logging Policy
 
 Decision: avoid logging raw notes, prompts, provider responses, API keys, tokens, credentials, and internal traces by default.
 

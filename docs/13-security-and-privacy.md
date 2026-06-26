@@ -53,6 +53,12 @@ Prompts and provider responses may contain sensitive user data. Real provider ca
 
 Persisting raw provider responses is a local/debug-only option and must be revisited before deployment.
 
+## Extracted Insights And Evidence Handling
+
+Extracted insights may reveal source-note content, product direction, market assumptions, or design-partner feedback. Evidence quotes are especially sensitive because they intentionally preserve the source language that supports an insight.
+
+Insight DTOs should expose only the fields needed for review. Internal payloads, debug metadata, raw provider output, and provider-specific traces should stay server-side unless a future feature explicitly defines a safe export path.
+
 ## Logging Policy
 
 Avoid logging:

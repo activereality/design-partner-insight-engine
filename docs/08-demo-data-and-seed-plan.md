@@ -2,6 +2,7 @@
 
 ## Synthetic Data Rules
 
+- Seed data must be fully synthetic.
 - Use invented people, companies, and notes.
 - Keep all demo notes generic, fictional, and non-sensitive.
 - Avoid private company information.
@@ -59,6 +60,10 @@ Handles support and onboarding together and needs clearer priority across setup 
 ## Demo Reset Behavior
 
 The future reset action should remove existing local demo records and recreate the OnboardIQ project, notes, extraction run, and draft insights in a predictable state.
+
+Demo reset must not require secrets, API keys, external provider calls, or network access. It should work with the mock AI provider and safe committed fixtures.
+
+Mock AI output should be safe to commit. Real AI-generated outputs should not be committed unless they were generated only from synthetic notes and reviewed for accidental sensitive content.
 
 ## What Must Never Appear In Seed Data
 

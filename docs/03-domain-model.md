@@ -86,6 +86,7 @@ Embedding evidence keeps the review screen simple and avoids extra lookups while
 Even with synthetic/demo data, model the domain as if real discovery notes may be sensitive later:
 
 - `ResearchNote.rawText`: sensitive. Do not log by default. Do not expose outside project-scoped API responses.
+- AI prompts derived from notes: sensitive. Do not persist or log by default unless intentionally scoped to local synthetic debugging.
 - `ExtractionRun.rawResponse`: sensitive/internal. Do not expose to frontend responses by default.
 - `InsightItem.evidence`: potentially sensitive. Include only what the review workflow needs.
 - `InsightItem.payload`: potentially sensitive. Treat as internal unless a DTO explicitly maps safe fields.
@@ -93,9 +94,13 @@ Even with synthetic/demo data, model the domain as if real discovery notes may b
 
 Frontend responses should use explicit DTOs that omit internal provider/debug payloads by default.
 
+Evidence is embedded in `InsightItem` for MVP simplicity, but that also means insight documents must be treated as potentially sensitive source-derived records.
+
 ## Project-Scoped Data Access
 
 All ResearchNote, ExtractionRun, InsightItem, and dashboard reads/writes should be scoped by `projectId`. Future workspace/user authorization should be able to plug into this boundary without rewriting the model. Do not trust client-provided ownership fields; derive relationships from route parameters and server-side lookups.
+
+Client-provided ownership or project scope should not be blindly trusted. The model should preserve future workspace/user authorization readiness by keeping project ownership explicit and consistently referenced.
 
 ## InsightType Enum
 
