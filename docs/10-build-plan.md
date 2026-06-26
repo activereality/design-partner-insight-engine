@@ -20,15 +20,17 @@ Suggested commit: `docs: add signalforge project foundation`
 
 ## 2. Repo/Tooling Scaffold
 
+Status: completed as initial root tooling only.
+
 Goal: add basic monorepo tooling.
 
-Scope: package manager, TypeScript config, formatting, linting plan.
+Scope: pnpm workspace metadata, root package scripts, shared TypeScript config, editor/formatting config, ignore rules, and placeholder workspace READMEs.
 
 Out of scope: app behavior.
 
-Likely files: root package/config files.
+Likely files: root package/config files, `apps/api/README.md`, `apps/web/README.md`, `packages/shared/README.md`.
 
-Verification: install and lint/typecheck commands run.
+Verification: root placeholder scripts run without requiring app packages.
 
 Security notes: add `.env.example` only if configuration is introduced; do not add `.env`.
 Security verification: no secrets in config files, no committed `.env`, and no generated files containing private paths or tokens.

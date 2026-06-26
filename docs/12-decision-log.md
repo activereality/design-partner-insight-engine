@@ -136,3 +136,15 @@ Rationale: provider responses may contain sensitive source data, prompts, or imp
 Decision: avoid logging raw notes, prompts, provider responses, API keys, tokens, credentials, and internal traces by default.
 
 Rationale: logs are easy to over-share during demos and deployment, so they should contain safe metadata unless local synthetic debugging is intentionally enabled.
+
+## ADR 022: pnpm Workspaces For Monorepo Tooling
+
+Decision: use pnpm workspaces for the SignalForge monorepo scaffold.
+
+Rationale: pnpm gives the project a lightweight workspace structure for future React, NestJS, and shared TypeScript packages without installing application dependencies before they are needed.
+
+Consequences:
+
+- Root scripts remain safe placeholders until app packages exist.
+- `apps/api`, `apps/web`, and `packages/shared` are tracked with README placeholders only.
+- No React, NestJS, MongoDB, Mongoose, AI provider, Docker, or test framework dependencies are introduced by this slice.

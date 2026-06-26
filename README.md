@@ -38,15 +38,17 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - Docker Compose later for local MongoDB
 - GitHub Actions later for CI
 
-App scaffolding has not been added yet. There are no package files, app folders, Docker files, dependencies, or framework-generated files in this docs-first phase.
+App scaffolding has not been added yet. Root pnpm workspace tooling and placeholder workspace directories exist, but there are no app source files, Docker files, dependencies, or framework-generated files yet.
 
 ## Local Setup
 
-Future placeholder until scaffolding exists:
+Current tooling scaffold:
 
 1. Clone the repository.
 2. Review `AGENTS.md` and the docs index below.
-3. Wait for the repo/tooling scaffold slice before running install, build, or test commands.
+3. Use `pnpm` for future workspace commands.
+4. Placeholder scripts are available with `pnpm format`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.
+5. Wait for the dedicated API and frontend scaffold slices before expecting runnable apps.
 
 ## Demo Flow
 
