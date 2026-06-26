@@ -58,15 +58,17 @@ Suggested commit: `feat(api): add nestjs shell`
 
 ## 4. MongoDB/Mongoose Connection
 
+Status: completed as local infrastructure and connection health only.
+
 Goal: connect the API to MongoDB.
 
-Scope: config, connection module, basic model registration.
+Scope: Docker Compose for local MongoDB, environment validation, Mongoose connection, and safe health status.
 
-Out of scope: full CRUD.
+Out of scope: full CRUD, product schemas, seed data, and product/domain modules.
 
-Likely files: API config and persistence modules.
+Likely files: `docker-compose.yml`, API config, `AppModule`, health endpoint, API README.
 
-Verification: app starts with local connection string.
+Verification: `docker compose up -d` starts MongoDB, API starts with local `.env`, and `GET /api/health` returns safe API and DB status.
 
 Security notes: read connection config from environment variables and keep `.env` uncommitted.
 Security verification: `.env.example` documents required variables if introduced, `.env` is absent, and connection strings are not hard-coded.

@@ -48,9 +48,11 @@ Current tooling scaffold:
 2. Review `AGENTS.md` and the docs index below.
 3. Use `pnpm` for future workspace commands.
 4. Run `pnpm install` after cloning.
-5. API shell commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
-6. The API health check is `GET http://localhost:3000/api/health`.
-7. Wait for the dedicated frontend scaffold slice before expecting a runnable web app.
+5. For local API development, copy `apps/api/.env.example` to `apps/api/.env` and keep `.env` uncommitted.
+6. Start local MongoDB with `docker compose up -d`.
+7. API shell commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
+8. The API health check is `GET http://localhost:3000/api/health`.
+9. Wait for the dedicated frontend scaffold slice before expecting a runnable web app.
 
 ## Demo Flow
 
@@ -64,7 +66,7 @@ Current tooling scaffold:
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current API shell connects to local MongoDB for infrastructure health only; product data models are still deferred.
 
 The intended structure is documented, not created yet.
 

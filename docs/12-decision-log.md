@@ -160,3 +160,21 @@ Consequences:
 - NestJS runtime dependencies are introduced for the API workspace.
 - MongoDB, Mongoose, provider packages, auth, seed data, and product endpoints remain deferred.
 - The API can establish safe defaults for future DTO validation and sanitized responses without implementing product logic.
+
+## ADR 024: Docker Compose For Local MongoDB
+
+Decision: use root-level Docker Compose for local MongoDB during development.
+
+Rationale: a local MongoDB service gives the API a repeatable infrastructure dependency without adding production deployment configuration.
+
+Consequences:
+
+- Local credentials are documented as development-only placeholders.
+- `.env.example` documents `MONGODB_URI`, but `.env` remains uncommitted.
+- Product schemas, seed data, and domain modules remain deferred.
+
+## ADR 025: Validate API Environment At Startup
+
+Decision: validate `PORT`, `NODE_ENV`, and `MONGODB_URI` during API startup.
+
+Rationale: missing or malformed configuration should fail clearly before the API starts serving requests, without logging raw connection strings or secrets.

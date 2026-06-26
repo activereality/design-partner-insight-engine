@@ -1,0 +1,16 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: signalforge-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: signalforge_local
+      MONGO_INITDB_ROOT_PASSWORD: signalforge_local_password
+      MONGO_INITDB_DATABASE: signalforge
+    ports:
+      - "27017:27017"
+    volumes:
+      - signalforge_mongodb_data:/data/db
+
+volumes:
+  signalforge_mongodb_data:
