@@ -5,9 +5,11 @@
   "description": "Docs-first monorepo scaffold for SignalForge, the Design Partner Insight Engine.",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "format": "node -e \"console.log('No format targets yet. Add Prettier when implementation packages are introduced.')\"",
-    "lint": "node -e \"console.log('No lint targets yet. Add linting when implementation packages are introduced.')\"",
-    "test": "node -e \"console.log('No test targets yet. Add tests with implementation slices.')\"",
-    "typecheck": "node -e \"console.log('No typecheck targets yet. Add package typechecks when app scaffolds are introduced.')\""
+    "build": "pnpm -r --if-present build",
+    "dev": "pnpm --filter @signalforge/api dev",
+    "format": "pnpm -r --if-present format",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck"
   }
 }

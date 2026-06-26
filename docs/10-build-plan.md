@@ -39,15 +39,17 @@ Suggested commit: `chore: scaffold signalforge tooling`
 
 ## 3. NestJS API Shell
 
+Status: completed as minimal API shell only.
+
 Goal: create the backend shell.
 
-Scope: NestJS app, health endpoint.
+Scope: NestJS app, global `/api` prefix, health endpoint, safe validation defaults, package scripts.
 
 Out of scope: database and AI behavior.
 
 Likely files: `apps/api/*`.
 
-Verification: API starts and `GET /health` returns ok.
+Verification: API starts and `GET /api/health` returns ok.
 
 Security notes: add global validation plumbing early; return sanitized errors.
 Security verification: validation is enabled, health response exposes no config/secrets, and error responses do not include stack traces in normal mode.

@@ -47,8 +47,10 @@ Current tooling scaffold:
 1. Clone the repository.
 2. Review `AGENTS.md` and the docs index below.
 3. Use `pnpm` for future workspace commands.
-4. Placeholder scripts are available with `pnpm format`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.
-5. Wait for the dedicated API and frontend scaffold slices before expecting runnable apps.
+4. Run `pnpm install` after cloning.
+5. API shell commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
+6. The API health check is `GET http://localhost:3000/api/health`.
+7. Wait for the dedicated frontend scaffold slice before expecting a runnable web app.
 
 ## Demo Flow
 

@@ -92,4 +92,4 @@ Future slices should include the most relevant checks for the touched surface: l
 
 ## Current Scaffold
 
-This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, and placeholder workspace directories. Do not add application code, dependencies, Docker files, database setup, CI files, or framework scaffolding until explicitly requested.
+This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, placeholder workspace directories, and a minimal NestJS API shell. Do not add product/domain logic, frontend scaffolding, database setup, Docker files, CI files, or AI provider code until explicitly requested.

@@ -147,4 +147,16 @@ Consequences:
 
 - Root scripts remain safe placeholders until app packages exist.
 - `apps/api`, `apps/web`, and `packages/shared` are tracked with README placeholders only.
-- No React, NestJS, MongoDB, Mongoose, AI provider, Docker, or test framework dependencies are introduced by this slice.
+- No React, NestJS, MongoDB, Mongoose, AI provider, Docker, or test framework dependencies were introduced by the repo/tooling scaffold slice.
+
+## ADR 023: Minimal NestJS API Shell First
+
+Decision: add a minimal NestJS API shell with a global `/api` prefix, `GET /api/health`, validation-friendly defaults, and no product/domain modules.
+
+Rationale: the backend needs a verifiable shell before MongoDB, domain workflows, AI providers, or frontend integration are introduced.
+
+Consequences:
+
+- NestJS runtime dependencies are introduced for the API workspace.
+- MongoDB, Mongoose, provider packages, auth, seed data, and product endpoints remain deferred.
+- The API can establish safe defaults for future DTO validation and sanitized responses without implementing product logic.
