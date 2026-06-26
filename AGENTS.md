@@ -46,13 +46,18 @@ Do not introduce industrial maintenance workflows, equipment troubleshooting, ma
 - Build the mock/demo path before integrating paid or external AI services.
 - Make outputs traceable to supplied notes and evidence.
 - Avoid speculative product claims that are not grounded in input data.
+- Build local-only slices with future deployment readiness in mind.
+- Document intentional security tradeoffs instead of hiding them.
 
 ## Coding Conventions
 
 - Use TypeScript throughout future app code.
 - Keep DTOs, validation, and persistence models clearly separated.
+- Validate backend inputs with explicit DTOs, schemas, enums, and bounded fields.
 - Use clear domain names from product discovery, not industrial operations.
 - Keep APIs and UI state predictable, boring, and easy to demo.
+- Scope data access by project ID so future workspace/user authorization can be added cleanly.
+- Do not trust client-provided ownership or runtime configuration fields.
 - Add tests with implementation slices when behavior is non-trivial.
 
 ## Docs-First Workflow
@@ -71,7 +76,7 @@ For future implementation work:
 
 ## Verification Expectations
 
-Future slices should include the most relevant checks for the touched surface: lint/typecheck, unit tests, API tests, UI smoke checks, or manual demo notes. If a check cannot be run, say so clearly.
+Future slices should include the most relevant checks for the touched surface: lint/typecheck, unit tests, API tests, UI smoke checks, or hands-on demo notes. If a check cannot be run, say so clearly.
 
 ## Data and Secrets
 
@@ -79,6 +84,11 @@ Future slices should include the most relevant checks for the touched surface: l
 - Do not commit real customer notes.
 - Do not commit private Gitwit, Mechro, interview, recruiter, or candidate information.
 - Do not commit secrets, API keys, tokens, credentials, or private connection strings.
+- Use environment variables for environment-specific configuration.
+- Add `.env.example` only when configuration is introduced; never add `.env`.
+- Keep AI provider keys server-side only.
+- Do not expose provider secrets, raw provider responses, or internal error traces to the frontend.
+- Avoid logging raw note contents, AI prompts, API keys, or full AI responses unless the data is clearly synthetic and the log is intentionally scoped for local debugging.
 
 ## Current Scaffold
 
