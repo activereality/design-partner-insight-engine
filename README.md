@@ -38,7 +38,7 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - Docker Compose later for local MongoDB
 - GitHub Actions later for CI
 
-App scaffolding has not been added yet. Root pnpm workspace tooling and placeholder workspace directories exist, but there are no app source files, Docker files, dependencies, or framework-generated files yet.
+The API and frontend shells now exist. Product workflows, seed data, AI extraction, auth, and dashboard experiences are still deferred.
 
 ## Local Setup
 
@@ -52,7 +52,8 @@ Current tooling scaffold:
 6. Start local MongoDB with `docker compose up -d`.
 7. API shell commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
 8. The API health check is `GET http://localhost:3000/api/health`.
-9. Wait for the dedicated frontend scaffold slice before expecting a runnable web app.
+9. Frontend shell commands are available with `pnpm --filter @signalforge/web dev`, `pnpm --filter @signalforge/web build`, and `pnpm --filter @signalforge/web typecheck`.
+10. The frontend runs at `http://127.0.0.1:5173` by default.
 
 ## Demo Flow
 
@@ -66,7 +67,7 @@ Current tooling scaffold:
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current API shell connects to local MongoDB for infrastructure health only; product data models are still deferred.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current API shell connects to local MongoDB for infrastructure health only, and the current web shell verifies routing, layout, and safe API health visibility. Product data models and workflows are still deferred.
 
 The intended structure is documented, not created yet.
 

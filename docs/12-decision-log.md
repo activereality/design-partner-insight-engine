@@ -178,3 +178,15 @@ Consequences:
 Decision: validate `PORT`, `NODE_ENV`, and `MONGODB_URI` during API startup.
 
 Rationale: missing or malformed configuration should fail clearly before the API starts serving requests, without logging raw connection strings or secrets.
+
+## ADR 026: Vite React Shell With React Router
+
+Decision: use Vite + React + TypeScript with React Router for the initial web shell.
+
+Rationale: this gives SignalForge a small, fast frontend foundation for future product workflows without adding a heavy design system or state/data-fetching stack before it is needed.
+
+Consequences:
+
+- The frontend has `/` and `/projects` routes only.
+- The health check uses a direct `fetch` and safe display fields; TanStack Query remains deferred.
+- Frontend configuration is limited to public-safe `VITE_*` values.

@@ -6,7 +6,9 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "build": "pnpm -r --if-present build",
-    "dev": "pnpm --filter @signalforge/api dev",
+    "dev": "pnpm --filter @signalforge/web dev",
+    "dev:api": "pnpm --filter @signalforge/api dev",
+    "dev:web": "pnpm --filter @signalforge/web dev",
     "format": "pnpm -r --if-present format",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test",

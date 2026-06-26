@@ -77,15 +77,17 @@ Suggested commit: `feat(api): add mongodb mongoose connection`
 
 ## 5. React App Shell
 
+Status: completed as minimal frontend shell only.
+
 Goal: create the frontend shell.
 
-Scope: React + TypeScript app, routing, basic layout.
+Scope: Vite React + TypeScript app, React Router, basic layout, home route, projects placeholder route, and safe API health display.
 
-Out of scope: complete UI workflow.
+Out of scope: complete UI workflow, project CRUD, notes UI, insight review, dashboard, auth, AI extraction UI, demo seed/reset, and TanStack Query.
 
 Likely files: `apps/web/*`.
 
-Verification: web app starts and renders initial route.
+Verification: web app starts, `/` loads, `/projects` loads, and API health status renders safe fields when the backend is running.
 
 Security verification: no provider keys or server-only config appear in frontend code or bundled environment variables.
 
