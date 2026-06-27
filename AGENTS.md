@@ -92,4 +92,4 @@ Future slices should include the most relevant checks for the touched surface: l
 
 ## Current Scaffold
 
-This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a NestJS API with MongoDB/Mongoose and projects/notes CRUD, and a Vite React frontend with projects/notes workflow screens. Do not add AI extraction, insight review, dashboard aggregation, CI files, auth, seed data, or AI provider code until explicitly requested.
+This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a NestJS API with MongoDB/Mongoose, projects/notes CRUD, deterministic mock extraction, generated insight records, and a Vite React frontend with projects/notes/mock-extraction workflow screens. Do not add real AI provider code, insight review/edit/accept, dashboard aggregation, CI files, auth, or seed data until explicitly requested.

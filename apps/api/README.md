@@ -74,6 +74,16 @@ Notes are created and listed through the route `projectId`; the client does not 
 
 Note list and create responses use a summary shape with no full `rawText`. They may include a short `rawTextPreview`. Note detail and update responses include full `rawText` for the edit workflow.
 
+Mock extraction and insights:
+
+- `POST /api/notes/:noteId/extract`
+- `GET /api/extraction-runs/:runId`
+- `GET /api/projects/:projectId/insights`
+- `GET /api/notes/:noteId/insights`
+- `GET /api/insights/:insightId`
+
+Mock extraction is deterministic and local-only. It derives `projectId` from the note server-side, creates an extraction run, stores generated `InsightItem` records, and does not call external AI providers.
+
 ## Security Notes
 
 - Global validation is enabled for future DTO-based endpoints.
@@ -84,10 +94,13 @@ Note list and create responses use a summary shape with no full `rawText`. They 
 - API responses should stay sanitized and avoid connection strings, stack traces, internal DB errors, or debug payloads.
 - Note list/create access is project-scoped so future workspace/user authorization can be added cleanly.
 - Full raw note text is returned only by note detail/update endpoints that need it for editing.
+- Extraction run responses do not expose raw provider/debug payloads, and mock `rawResponse` metadata does not store raw note text.
+- Insight responses omit internal `payload`; evidence snippets should still be treated as potentially sensitive.
 
 ## Intentionally Not Implemented Yet
 
-- Insights, extraction runs, or dashboard endpoints
-- AI provider abstraction or provider packages
+- Real AI provider adapters or provider packages
+- Insight review/edit/accept endpoints
+- Dashboard endpoints
 - Auth
 - Seed data

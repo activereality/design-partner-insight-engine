@@ -203,3 +203,18 @@ Consequences:
 - `ResearchNote.rawText` is returned only for the note workflow and remains treated as sensitive by design.
 - Clients do not provide note ownership or project scope fields during note creation.
 - AI extraction, insights, dashboard aggregation, auth, seed/reset, and provider code remain deferred.
+
+## ADR 028: Deterministic Mock Extraction Workflow
+
+Decision: implement the first extraction workflow with a deterministic mock extractor only.
+
+Rationale: mock extraction proves the end-to-end product loop without network access, provider packages, API keys, paid calls, or provider-specific failure modes.
+
+Consequences:
+
+- `POST /api/notes/:noteId/extract` derives `projectId` from the note server-side.
+- Extraction runs persist provider `mock`, model `mock-design-partner-extractor`, prompt/schema versions, status, and safe metadata.
+- Mock `rawResponse` stores deterministic metadata only and does not store raw note text.
+- Generated insights are persisted with `reviewStatus: ai_generated` until a later review/edit/accept workflow exists.
+- Insight API responses omit internal `payload`; evidence snippets remain potentially sensitive and should be handled carefully.
+- OpenAI, Anthropic, Gemini, dashboard aggregation, auth, and seed/reset remain deferred.

@@ -2,6 +2,12 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import {
+  listNoteInsights,
+  runMockExtraction,
+  type ExtractionRun,
+  type InsightItem
+} from '../api/extraction';
+import {
   getResearchNote,
   noteSourceTypes,
   updateResearchNote,
@@ -27,6 +33,12 @@ export function NoteDetailPage() {
   const [form, setForm] = useState<NoteEditState | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [insights, setInsights] = useState<InsightItem[]>([]);
+  const [latestRun, setLatestRun] = useState<ExtractionRun | null>(null);
+  const [insightStatus, setInsightStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [extractionStatus, setExtractionStatus] = useState<
+    'idle' | 'running' | 'succeeded' | 'error'
+  >('idle');
 
   useEffect(() => {
     if (!noteId) {
@@ -36,8 +48,8 @@ export function NoteDetailPage() {
 
     let ignore = false;
 
-    getResearchNote(noteId)
-      .then((result) => {
+    Promise.all([getResearchNote(noteId), listNoteInsights(noteId)])
+      .then(([result, insightResults]) => {
         if (!ignore) {
           setNote(result);
           setForm({
@@ -47,12 +59,15 @@ export function NoteDetailPage() {
             sourceType: result.sourceType,
             title: result.title
           });
+          setInsights(insightResults);
           setStatus('ready');
+          setInsightStatus('ready');
         }
       })
       .catch(() => {
         if (!ignore) {
           setStatus('error');
+          setInsightStatus('error');
         }
       });
 
@@ -89,8 +104,31 @@ export function NoteDetailPage() {
     }
   }
 
+  async function onRunExtraction() {
+    if (!noteId) {
+      return;
+    }
+
+    setExtractionStatus('running');
+
+    try {
+      const result = await runMockExtraction(noteId);
+      setLatestRun(result.run);
+      setInsights(result.insights);
+      setExtractionStatus('succeeded');
+      setInsightStatus('ready');
+    } catch {
+      setExtractionStatus('error');
+    }
+  }
+
+  const insightsByType = insights.reduce<Record<string, InsightItem[]>>((groups, insight) => {
+    groups[insight.type] = [...(groups[insight.type] ?? []), insight];
+    return groups;
+  }, {});
+
   return (
-    <main className="page-shell">
+    <main className="page-shell detail-grid">
       <section className="content-panel narrow-panel" aria-labelledby="note-detail-title">
         <Link className="text-link" to={projectId ? `/projects/${projectId}` : '/projects'}>
           Back to project
@@ -176,6 +214,85 @@ export function NoteDetailPage() {
               </button>
             </form>
           </>
+        )}
+      </section>
+
+      <section className="content-panel" aria-labelledby="mock-extraction-title">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Mock extraction</p>
+            <h2 id="mock-extraction-title">Generated insights</h2>
+          </div>
+          <button
+            className="button primary"
+            disabled={extractionStatus === 'running' || status !== 'ready'}
+            onClick={onRunExtraction}
+            type="button"
+          >
+            {extractionStatus === 'running' ? 'Running...' : 'Run Mock Extraction'}
+          </button>
+        </div>
+
+        <p className="subtle-note">
+          This uses deterministic mock output only. No real AI provider is called, and review/edit/accept arrives in a later slice.
+        </p>
+
+        {latestRun && (
+          <dl className="metadata-grid">
+            <div>
+              <dt>Status</dt>
+              <dd>{latestRun.status}</dd>
+            </div>
+            <div>
+              <dt>Provider</dt>
+              <dd>{latestRun.provider}</dd>
+            </div>
+          </dl>
+        )}
+
+        {extractionStatus === 'error' && (
+          <p className="safe-error">Mock extraction could not run. Check the local API connection.</p>
+        )}
+
+        {insightStatus === 'loading' && <p>Loading generated insights.</p>}
+        {insightStatus === 'error' && (
+          <p className="safe-error">Generated insights could not be loaded.</p>
+        )}
+        {insightStatus === 'ready' && insights.length === 0 && (
+          <p>No generated insights yet. Run mock extraction to create draft insight cards.</p>
+        )}
+        {insightStatus === 'ready' && insights.length > 0 && (
+          <div className="insight-groups">
+            {Object.entries(insightsByType).map(([type, items]) => (
+              <section className="insight-group" key={type} aria-label={`${type} insights`}>
+                <h3>{type}</h3>
+                <div className="insight-list">
+                  {items.map((insight) => (
+                    <article className="insight-card" key={insight.id}>
+                      <div className="section-heading compact-heading">
+                        <div>
+                          <strong>{insight.title}</strong>
+                          <small>{insight.reviewStatus}</small>
+                        </div>
+                        <span className="status-pill">
+                          {Math.round(insight.confidence * 100)}%
+                        </span>
+                      </div>
+                      <p>{insight.summary}</p>
+                      {insight.urgency && <p className="subtle-note">Urgency: {insight.urgency}</p>}
+                      {insight.evidence.length > 0 && (
+                        <div className="evidence-list">
+                          {insight.evidence.map((item) => (
+                            <p key={`${insight.id}-${item.snippet}`}>{item.snippet}</p>
+                          ))}
+                        </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
         )}
       </section>
     </main>

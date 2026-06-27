@@ -38,7 +38,7 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - Docker Compose for local MongoDB
 - GitHub Actions later for CI
 
-The API and frontend now support a small projects-and-notes workflow. Seed data, AI extraction, auth, and dashboard experiences are still deferred.
+The API and frontend now support projects, notes, and deterministic mock extraction. Seed data, real AI providers, auth, insight review, and dashboard experiences are still deferred.
 
 ## Local Setup
 
@@ -59,12 +59,13 @@ Current tooling scaffold:
 
 1. Create a product discovery project.
 2. Paste or load synthetic messy design-partner notes.
-3. Review the project and note detail pages.
-4. Later slices will add mock extraction, evidence-backed insight review, and dashboard summaries.
+3. Run mock extraction from the note detail page.
+4. Review generated evidence-backed insight cards.
+5. Later slices will add edit/accept/reject review controls and dashboard summaries.
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current implementation connects to local MongoDB and supports project-scoped synthetic projects and raw research notes. AI extraction, insight review, dashboard aggregation, and seed/reset flows are still deferred.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current implementation connects to local MongoDB and supports project-scoped synthetic projects, raw research notes, mock extraction runs, and generated insight items. Real AI providers, insight review, dashboard aggregation, and seed/reset flows are still deferred.
 
 The intended structure is documented, not created yet.
 

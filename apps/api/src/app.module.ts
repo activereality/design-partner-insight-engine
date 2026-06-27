@@ -3,7 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, type MongooseModuleOptions } from '@nestjs/mongoose';
 
 import { validateEnvironment } from './config/env.validation';
+import { ExtractionRunsModule } from './extraction-runs/extraction-runs.module';
 import { HealthModule } from './health/health.module';
+import { InsightsModule } from './insights/insights.module';
 import { NotesModule } from './notes/notes.module';
 import { ProjectsModule } from './projects/projects.module';
 
@@ -24,7 +26,9 @@ import { ProjectsModule } from './projects/projects.module';
     }),
     HealthModule,
     ProjectsModule,
-    NotesModule
+    NotesModule,
+    InsightsModule,
+    ExtractionRunsModule
   ]
 })
 export class AppModule {}

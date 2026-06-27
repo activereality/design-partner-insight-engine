@@ -114,18 +114,20 @@ Suggested commit: `feat: add projects and notes workflow`
 
 ## 7. Mock Extraction Workflow
 
+Status: completed as deterministic local mock extraction only.
+
 Goal: produce deterministic draft insights from synthetic notes.
 
-Scope: mock provider and extraction run endpoint.
+Scope: extraction run persistence, insight item persistence, mock extractor service, extraction endpoint, insight read endpoints, and note-detail UI for running/displaying mock extraction.
 
-Out of scope: external AI calls.
+Out of scope: external AI calls, provider packages, review/edit/accept workflow, dashboard aggregation, demo seed/reset, auth, file upload, transcription, and search.
 
-Likely files: AI provider interface, mock provider, extraction service.
+Likely files: extraction run module, insights module, mock extractor, API clients, note detail page.
 
-Verification: extraction creates draft InsightItem records.
+Verification: extraction creates draft `InsightItem` records and a succeeded `ExtractionRun` from a note.
 
 Security notes: keep provider selection server-controlled or enum-validated, avoid logging full note content/prompts, and keep provider keys server-side.
-Security verification: mock provider works without API keys, no raw prompts/responses are logged by default, and provider credentials cannot be supplied by the client.
+Security verification: mock provider works without API keys, note list responses still exclude full `rawText`, no raw prompts/responses are logged by default, raw note text is not stored in extraction `rawResponse`, and provider credentials cannot be supplied by the client.
 
 Suggested commit: `feat(ai): add mock extraction workflow`
 
