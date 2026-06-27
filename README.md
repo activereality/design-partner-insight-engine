@@ -49,12 +49,40 @@ Current tooling scaffold:
 3. Use `pnpm` for future workspace commands.
 4. Run `pnpm install` after cloning.
 5. For local API development, copy `apps/api/.env.example` to `apps/api/.env` and keep `.env` uncommitted.
-6. Start local MongoDB with `docker compose up -d`.
+6. Start local MongoDB with `docker-compose up -d`.
 7. API commands are available with `pnpm --filter @signalforge/api dev`, `pnpm --filter @signalforge/api build`, and `pnpm --filter @signalforge/api typecheck`.
 8. The API health check is `GET http://localhost:3000/api/health`.
 9. Frontend commands are available with `pnpm --filter @signalforge/web dev`, `pnpm --filter @signalforge/web build`, and `pnpm --filter @signalforge/web typecheck`.
 10. The frontend runs at `http://127.0.0.1:5173` by default.
 11. To use demo tools locally, set `DEMO_TOOLS_ENABLED=true` in uncommitted API environment configuration. Keep it `false` by default and never enable demo reset in production.
+
+## Quick Local Start
+
+Use the PowerShell helpers for local development on Windows:
+
+```powershell
+.\scripts\dev-start.ps1
+```
+
+For a seeded local demo:
+
+```powershell
+.\scripts\dev-start.ps1 -EnableDemoTools -SeedDemo
+```
+
+Check status:
+
+```powershell
+.\scripts\dev-health.ps1
+```
+
+Stop local MongoDB:
+
+```powershell
+.\scripts\dev-stop.ps1
+```
+
+Manual commands and troubleshooting are in the [Local Runbook](docs/14-local-runbook.md). Do not commit local `.env` files.
 
 ## Demo Flow
 
@@ -104,6 +132,7 @@ It is also not intended to process real customer data in this portfolio phase.
 - [11 Gitwit Talking Points](docs/11-gitwit-talking-points.md)
 - [12 Decision Log](docs/12-decision-log.md)
 - [13 Security and Privacy](docs/13-security-and-privacy.md)
+- [14 Local Runbook](docs/14-local-runbook.md)
 
 ## Roadmap
 
@@ -119,9 +148,10 @@ It is also not intended to process real customer data in this portfolio phase.
 10. Completed: review/edit/accept workflow.
 11. Completed: dashboard aggregation.
 12. Completed: demo seed/reset.
-13. Polish README and screenshots.
-14. Add CI.
-15. Optionally deploy.
+13. Completed: local runbook and dev scripts.
+14. Polish README and screenshots.
+15. Add CI.
+16. Optionally deploy.
 
 ## Gitwit Alignment
 

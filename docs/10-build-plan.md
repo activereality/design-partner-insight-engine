@@ -226,7 +226,26 @@ Security verification: seed data is fictional, reset does not touch non-demo rec
 
 Suggested commit: `feat(demo): add synthetic seed reset`
 
-## 13. Polish And README Screenshots
+## 13. Local Runbook And Dev Scripts
+
+Status: completed as local developer run documentation and PowerShell helpers.
+
+Goal: make local app startup predictable on Windows without adding product features.
+
+Scope: local runbook, safe PowerShell start/stop/health scripts, `docker-compose` preference, local `.env` copying from examples, optional demo-tool enablement, optional demo seed, and README links.
+
+Out of scope: new product behavior, dependencies, CI, deployment, production runbooks, secret management, and real provider setup.
+
+Likely files: `docs/14-local-runbook.md`, `scripts/dev-start.ps1`, `scripts/dev-stop.ps1`, `scripts/dev-health.ps1`, README/docs updates.
+
+Verification: helper scripts run from the repo root, health output is safe, start script can prepare local env files and launch MongoDB/API/web, optional seed can populate the gated demo, and stop script stops MongoDB without deleting volumes by default.
+
+Security notes: scripts must not print secrets or full connection strings, must not insert real provider keys, must keep `AI_PROVIDER=mock`, and must leave `.env` files gitignored.
+Security verification: no `.env` files are committed, helper output omits secrets, and demo tools are enabled only through an explicit local switch.
+
+Suggested commit: `docs: add local runbook and dev scripts`
+
+## 14. Polish And README Screenshots
 
 Goal: make the demo interview-ready.
 
@@ -242,7 +261,7 @@ Security verification: screenshots and README examples show synthetic data only 
 
 Suggested commit: `docs: polish demo screenshots`
 
-## 14. CI
+## 15. CI
 
 Goal: add automated checks.
 
@@ -258,7 +277,7 @@ Security verification: CI does not require real provider keys, does not echo sec
 
 Suggested commit: `ci: add validation workflow`
 
-## 15. Optional Deployment
+## 16. Optional Deployment
 
 Goal: deploy the demo if useful.
 

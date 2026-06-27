@@ -29,6 +29,8 @@ The frontend only uses public-safe Vite configuration:
 
 Copy `.env.example` to `.env` for local overrides if needed. Never put backend secrets, MongoDB connection strings, AI provider keys, tokens, credentials, or private data in frontend environment variables.
 
+For local startup, use `scripts/dev-start.ps1` from the repo root or follow `docs/14-local-runbook.md`.
+
 ## Security Notes
 
 - The health check displays safe status fields only.

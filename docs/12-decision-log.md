@@ -315,3 +315,18 @@ Consequences:
 - The dashboard is useful immediately after seed.
 - Seed data avoids real people, real companies, private notes, recruiter/interview content, Gitwit/Mechro details, and product-boundary drift.
 - OpenAI, Anthropic, Gemini, and other real providers are not called during demo seed/reset.
+
+## ADR 036: Local Runbook And PowerShell Helpers
+
+Decision: document local startup in `docs/14-local-runbook.md` and add PowerShell helpers for Windows development and demos.
+
+Rationale: the app now has multiple local processes, MongoDB, local env files, and gated demo tools. A repeatable runbook keeps interview demos reliable without adding product features.
+
+Consequences:
+
+- `scripts/dev-start.ps1` prepares missing local `.env` files from examples, prefers `docker-compose`, starts MongoDB, and launches API/web dev servers.
+- `scripts/dev-health.ps1` prints safe local status without secrets or connection strings.
+- `scripts/dev-stop.ps1` stops MongoDB without deleting volumes by default.
+- The start script keeps `AI_PROVIDER=mock` and never inserts real provider keys.
+- Demo tools are enabled only with an explicit local switch.
+- `.env` files remain gitignored and must not be committed.

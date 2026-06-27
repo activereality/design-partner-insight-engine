@@ -44,16 +44,24 @@ Demo tool values:
 Start MongoDB from the repo root:
 
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 Stop it when finished:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
 The Compose file is for local development only and uses a named Docker volume.
+
+The repo also includes local PowerShell helpers:
+
+- `scripts/dev-start.ps1`
+- `scripts/dev-health.ps1`
+- `scripts/dev-stop.ps1`
+
+See `docs/14-local-runbook.md` for the full local runbook.
 
 ## Health Endpoint
 
