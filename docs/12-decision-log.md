@@ -202,7 +202,7 @@ Consequences:
 - Project and note inputs use explicit DTOs, enums, ObjectId validation, and bounded text fields.
 - `ResearchNote.rawText` is returned only for the note workflow and remains treated as sensitive by design.
 - Clients do not provide note ownership or project scope fields during note creation.
-- AI extraction, insights, dashboard aggregation, auth, seed/reset, and provider code remain deferred.
+- AI extraction, insights, dashboard aggregation, auth, seed/reset, and provider code were deferred to later slices.
 
 ## ADR 028: Deterministic Mock Extraction Workflow
 
@@ -215,6 +215,65 @@ Consequences:
 - `POST /api/notes/:noteId/extract` derives `projectId` from the note server-side.
 - Extraction runs persist provider `mock`, model `mock-design-partner-extractor`, prompt/schema versions, status, and safe metadata.
 - Mock `rawResponse` stores deterministic metadata only and does not store raw note text.
-- Generated insights are persisted with `reviewStatus: ai_generated` until a later review/edit/accept workflow exists.
+- Generated insights are first persisted with `reviewStatus: ai_generated`; human review actions can later accept, reject, edit, or mark them as needing follow-up.
 - Insight API responses omit internal `payload`; evidence snippets remain potentially sensitive and should be handled carefully.
-- OpenAI, Anthropic, Gemini, dashboard aggregation, auth, and seed/reset remain deferred.
+- OpenAI provider integration and dashboard aggregation were deferred to later slices; Anthropic/Gemini providers, auth, and seed/reset remain deferred.
+
+## ADR 029: Validate Extraction Output Before Persistence
+
+Decision: define `design_partner_extraction.v1` as a backend-local runtime contract and validate extraction output before creating `InsightItem` records.
+
+Rationale: provider output is untrusted, even from a deterministic mock. Validating the full extraction shape early prevents malformed insights from becoming persisted product data.
+
+Consequences:
+
+- `schemaVersion`, `promptVersion`, and the mock model name are code constants.
+- Mock extraction returns a full `DesignPartnerExtraction` object instead of ad hoc insight drafts.
+- The extraction service parses output before mapping it into persisted insight records.
+- Validation failures mark the extraction run failed with safe metadata and do not expose raw output, payloads, stack traces, or raw note text.
+- Focused Node tests cover valid parsing, invalid parsing, and mapping validated output into persistable insight drafts.
+
+## ADR 030: Provider Abstraction With Mock Default And Optional OpenAI
+
+Decision: route extraction through a provider abstraction with mock as the default provider and OpenAI as an optional server-side provider.
+
+Rationale: the product can demonstrate deterministic extraction locally without keys while leaving a clean path to real provider calls when configured.
+
+Consequences:
+
+- `AI_PROVIDER` defaults to `mock`.
+- `OPENAI_API_KEY` and `OPENAI_MODEL` are required only when `AI_PROVIDER=openai`.
+- The OpenAI provider uses the official Node SDK and Responses API structured output path.
+- Provider output is validated against `design_partner_extraction.v1` before persistence.
+- OpenAI keys, prompts, raw provider responses, provider errors, and internal debug payloads are not exposed to the frontend.
+- Normal extraction run responses omit full raw provider responses, and insight responses continue to omit internal `payload`.
+- Anthropic/Gemini providers, streaming, dashboard, auth, and seed/reset remain deferred.
+
+## ADR 031: Human Review Before Insight Acceptance
+
+Decision: keep generated insights in `ai_generated` status until a human reviewer accepts, rejects, edits, or marks them as needing follow-up.
+
+Rationale: SignalForge should demonstrate AI-assisted discovery synthesis without pretending generated output is automatically correct.
+
+Consequences:
+
+- Review actions are explicit API calls and persist `reviewedAt`.
+- Editing is limited to bounded human-review fields and preserves generated originals internally.
+- No fake reviewer identity is recorded while auth/user accounts are out of scope.
+- The client cannot edit internal `payload`, evidence, extraction metadata, project scope, note scope, provider details, or raw provider output.
+- Insight responses continue to omit internal `payload`; extraction run responses continue to omit `rawResponse`.
+- Review workflow remained project/discovery-focused and did not itself add dashboard aggregation, auth, seed/reset, audit logging, or provider comparison behavior.
+
+## ADR 032: Dashboard Summarizes Reviewed Signal
+
+Decision: aggregate the project dashboard from current project-scoped insights, treating accepted and edited insights as primary signal while keeping needs-follow-up and unreviewed AI-generated insights separate.
+
+Rationale: the dashboard should support product decisions without presenting raw AI output as final authority.
+
+Consequences:
+
+- Rejected insights are counted but excluded from primary recommendation sections.
+- Unreviewed `ai_generated` insights are counted as draft signal, not shown as final dashboard recommendations.
+- Decision recommendation buckets are derived server-side from persisted insight metadata and returned as safe DTOs.
+- Dashboard responses omit internal `payload`, extraction `rawResponse`, full note `rawText`, raw provider output, provider details, and secrets.
+- The dashboard remains a current-state view; historical snapshots, exports, audit logs, auth roles, and advanced analytics remain out of scope.

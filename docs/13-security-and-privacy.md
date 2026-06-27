@@ -42,6 +42,7 @@ InsightItem:
 - `payload` is potentially sensitive and should be internal unless explicitly mapped to a safe DTO.
 - `evidence` is potentially sensitive because quotes can contain raw note language.
 - `summary` and `title` may reveal sensitive product direction.
+- `reviewNotes`, edited titles, and edited summaries may contain reviewer-entered source context and should be treated as potentially sensitive.
 
 ## Raw Notes Handling
 
@@ -51,13 +52,17 @@ Raw notes should be accepted only through validated backend DTOs. Do not log ful
 
 Prompts and provider responses may contain sensitive user data. Real provider calls must stay server-side. Provider keys must never be sent to the frontend. Raw provider responses should be normalized and validated before persistence or display.
 
-Persisting raw provider responses is a local/debug-only option and must be revisited before deployment.
+The current provider path does not persist full raw provider responses in normal extraction runs. Any future raw-response persistence must be an explicit local/debug feature and must be revisited before deployment.
 
 ## Extracted Insights And Evidence Handling
 
 Extracted insights may reveal source-note content, product direction, market assumptions, or design-partner feedback. Evidence quotes are especially sensitive because they intentionally preserve the source language that supports an insight.
 
 Insight DTOs should expose only the fields needed for review. Internal payloads, debug metadata, raw provider output, and provider-specific traces should stay server-side unless a future feature explicitly defines a safe export path.
+
+Review updates should be metadata- and review-field-only. Clients may update bounded title, summary, and review notes, or set explicit review statuses. Clients should not be able to update internal payloads, evidence, project scope, note scope, extraction metadata, provider metadata, raw responses, or generated-original fields.
+
+Dashboard DTOs should aggregate reviewed signal without widening data exposure. Accepted and edited insights may appear as primary signal, needs-follow-up insights should remain unresolved, unreviewed AI-generated insights should stay separate, and rejected insights should be excluded from primary recommendations. Dashboard responses should not include full note `rawText`, internal insight `payload`, extraction `rawResponse`, raw provider output, provider details, or secrets.
 
 ## Logging Policy
 
@@ -66,6 +71,7 @@ Avoid logging:
 - raw note contents
 - AI prompts
 - provider responses
+- review edits or reviewer notes when they may contain source-derived details
 - API keys
 - tokens
 - credentials
@@ -83,7 +89,7 @@ Invalid inputs should fail with clear, safe messages. Do not leak implementation
 
 Use environment variables for configuration that differs by environment. Add `.env.example` only when configuration is introduced. Never commit `.env`.
 
-Provider keys, connection strings, and credentials stay server-side.
+Provider keys, connection strings, and credentials stay server-side. `OPENAI_API_KEY` is required only when `AI_PROVIDER=openai` and must never appear in frontend configuration.
 
 ## Frontend/Backend Boundary
 

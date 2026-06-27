@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, type MongooseModuleOptions } from '@nestjs/mongoose';
 
 import { validateEnvironment } from './config/env.validation';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { ExtractionRunsModule } from './extraction-runs/extraction-runs.module';
 import { HealthModule } from './health/health.module';
 import { InsightsModule } from './insights/insights.module';
@@ -28,6 +29,7 @@ import { ProjectsModule } from './projects/projects.module';
     ProjectsModule,
     NotesModule,
     InsightsModule,
+    DashboardModule,
     ExtractionRunsModule
   ]
 })

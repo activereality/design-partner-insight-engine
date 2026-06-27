@@ -33,12 +33,12 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - MongoDB + Mongoose persistence
 - AI provider abstraction
 - Mock AI provider first
-- OpenAI provider later
+- Optional OpenAI provider server-side
 - Future-ready for Anthropic and Gemini
 - Docker Compose for local MongoDB
 - GitHub Actions later for CI
 
-The API and frontend now support projects, notes, and deterministic mock extraction. Seed data, real AI providers, auth, insight review, and dashboard experiences are still deferred.
+The API and frontend now support projects, notes, deterministic mock extraction, optional server-side OpenAI extraction, human review actions for generated insights, and a reviewed-signal project dashboard. Mock remains the default. Seed data, auth, deployment, and CI are still deferred.
 
 ## Local Setup
 
@@ -59,15 +59,16 @@ Current tooling scaffold:
 
 1. Create a product discovery project.
 2. Paste or load synthetic messy design-partner notes.
-3. Run mock extraction from the note detail page.
+3. Run extraction from the note detail page. Local development uses the mock provider unless the API is configured for OpenAI.
 4. Review generated evidence-backed insight cards.
-5. Later slices will add edit/accept/reject review controls and dashboard summaries.
+5. Accept, reject, edit, or mark insights as needing follow-up.
+6. Return to the project dashboard to see reviewed signal grouped into decision recommendations and next discovery work.
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that starts with deterministic mock output before external AI integration. The current implementation connects to local MongoDB and supports project-scoped synthetic projects, raw research notes, mock extraction runs, and generated insight items. Real AI providers, insight review, dashboard aggregation, and seed/reset flows are still deferred.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that defaults to deterministic mock output. The current implementation connects to local MongoDB and supports project-scoped synthetic projects, raw research notes, validated extraction runs, generated insight items, human review status/edit flows, reviewed-signal dashboard aggregation, and an optional server-side OpenAI provider. Seed/reset flows are still deferred.
 
-The intended structure is documented, not created yet.
+The current structure remains intentionally small and slice-based.
 
 ## Key Product Decisions
 
@@ -106,17 +107,17 @@ It is also not intended to process real customer data in this portfolio phase.
 
 ## Roadmap
 
-1. Complete docs foundation.
-2. Add repo/tooling scaffold.
-3. Add NestJS API shell.
-4. Add MongoDB/Mongoose connection.
-5. Add React app shell.
-6. Implement projects and notes CRUD.
-7. Implement mock extraction workflow.
-8. Validate extraction schema.
-9. Add OpenAI provider.
-10. Add review/edit/accept workflow.
-11. Add dashboard aggregation.
+1. Completed: docs foundation.
+2. Completed: repo/tooling scaffold.
+3. Completed: NestJS API shell.
+4. Completed: MongoDB/Mongoose connection.
+5. Completed: React app shell.
+6. Completed: projects and notes CRUD.
+7. Completed: mock extraction workflow.
+8. Completed: extraction schema validation.
+9. Completed: optional OpenAI provider.
+10. Completed: review/edit/accept workflow.
+11. Completed: dashboard aggregation.
 12. Add demo seed/reset.
 13. Polish README and screenshots.
 14. Add CI.

@@ -6,6 +6,9 @@ import { ResearchNote, ResearchNoteSchema } from '../notes/schemas/research-note
 import { ExtractionRunsController } from './extraction-runs.controller';
 import { ExtractionRunsService } from './extraction-runs.service';
 import { MockExtractionService } from './mock-extraction.service';
+import { InsightExtractionProviderSelector } from './providers/insight-extraction-provider.selector';
+import { MockInsightExtractionProvider } from './providers/mock-insight-extraction.provider';
+import { OpenAiInsightExtractionProvider } from './providers/openai-insight-extraction.provider';
 import { ExtractionRun, ExtractionRunSchema } from './schemas/extraction-run.schema';
 
 @Module({
@@ -17,6 +20,12 @@ import { ExtractionRun, ExtractionRunSchema } from './schemas/extraction-run.sch
     ])
   ],
   controllers: [ExtractionRunsController],
-  providers: [ExtractionRunsService, MockExtractionService]
+  providers: [
+    ExtractionRunsService,
+    MockExtractionService,
+    MockInsightExtractionProvider,
+    OpenAiInsightExtractionProvider,
+    InsightExtractionProviderSelector
+  ]
 })
 export class ExtractionRunsModule {}

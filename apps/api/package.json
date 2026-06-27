@@ -9,7 +9,7 @@
     "dev": "pnpm run build && node dist/main.js",
     "lint": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/main.js",
-    "test": "node -e \"console.log('No API tests yet. Add tests with behavior slices.')\"",
+    "test": "pnpm run build && node --test test/*.test.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "mongoose": "^8.9.2",
+    "openai": "^6.45.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

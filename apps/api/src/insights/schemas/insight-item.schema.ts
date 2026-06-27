@@ -33,8 +33,14 @@ export class InsightItem {
   @Prop({ required: true, trim: true, maxlength: 160 })
   title!: string;
 
+  @Prop({ trim: true, maxlength: 160 })
+  originalTitle?: string;
+
   @Prop({ required: true, trim: true, maxlength: 1000 })
   summary!: string;
+
+  @Prop({ trim: true, maxlength: 1000 })
+  originalSummary?: string;
 
   @Prop({ required: true, min: 0, max: 1 })
   confidence!: number;
@@ -44,6 +50,15 @@ export class InsightItem {
 
   @Prop({ enum: Object.values(InsightReviewStatus), required: true, type: String })
   reviewStatus!: InsightReviewStatus;
+
+  @Prop({ type: Date })
+  reviewedAt?: Date;
+
+  @Prop({ type: Date })
+  editedAt?: Date;
+
+  @Prop({ trim: true, maxlength: 1000 })
+  reviewNotes?: string;
 
   @Prop({
     default: [],

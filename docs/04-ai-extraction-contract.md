@@ -11,79 +11,97 @@
 
 ## Provider Abstraction
 
-The backend should depend on an interface such as `AiExtractionProvider`. Provider adapters can implement mock, OpenAI, Anthropic, or Gemini behavior later without changing controllers or review workflow code.
+The backend depends on a provider interface that returns `DesignPartnerExtraction`. Provider adapters can implement mock, OpenAI, Anthropic, or Gemini behavior without changing controllers or review workflow code.
 
 Provider keys must stay server-side. The frontend should never receive provider secrets, raw provider responses, or provider-specific internal errors.
 
 ## Provider Order
 
 1. Mock provider first for local demo stability.
-2. OpenAI provider later.
+2. OpenAI provider is optional and server-side only.
 3. Anthropic/Gemini adapters only when useful.
 
 The mock provider should remain the default for demos and development without API keys. Real provider calls must remain server-side.
 
+## OpenAI Provider Behavior
+
+The OpenAI provider uses the official OpenAI Node SDK and the Responses API. It requests structured output with a JSON schema aligned to `design_partner_extraction.v1`, then passes the returned object through the same runtime validator used by the mock provider before persistence.
+
+`AI_PROVIDER=openai` requires server-side `OPENAI_API_KEY` and `OPENAI_MODEL`. These values are never exposed to the frontend. The provider does not log prompts or raw provider responses, and normal extraction run responses do not expose raw provider/debug payloads.
+
 ## Schema Version
 
 `design_partner_extraction.v1`
+
+The backend keeps this value as a code constant and rejects unsupported schema versions before persistence.
+
+## Prompt Version
+
+`mock_prompt.v1`
+
+The mock prompt version is a placeholder constant for deterministic local extraction. Real prompts and provider-specific prompt versions are deferred.
 
 ## TypeScript-Style Schema
 
 ```ts
 type ExtractionSchemaVersion = 'design_partner_extraction.v1';
 
-type InsightType =
-  | 'persona'
-  | 'user_job'
-  | 'pain_point'
-  | 'workaround'
-  | 'urgency_signal'
-  | 'buying_trigger'
-  | 'feature_hypothesis'
-  | 'risk'
-  | 'open_question'
-  | 'pilot_success_criteria'
-  | 'recommended_experiment'
-  | 'decision_recommendation'
-  | 'quality_flag';
+type Confidence = 'low' | 'medium' | 'high';
+type Urgency = 'low' | 'medium' | 'high' | 'unknown';
+type EvidenceStrength = 'weak' | 'moderate' | 'strong';
+type DecisionRecommendation = 'build_now' | 'learn_more' | 'ignore_for_now';
 
-type ReviewStatus =
-  | 'draft'
-  | 'accepted'
-  | 'edited'
-  | 'rejected'
-  | 'needs_follow_up';
-
-type DecisionRecommendation = 'build_now' | 'learn_more' | 'ignore';
-
-interface ExtractionResult {
+interface DesignPartnerExtraction {
   schemaVersion: ExtractionSchemaVersion;
-  projectSummary: string;
-  insights: ExtractedInsight[];
+  noteSummary: string;
+  personas: PersonaInsight[];
+  userJobs: UserJobInsight[];
+  painPoints: PainPointInsight[];
+  currentWorkarounds: WorkaroundInsight[];
+  urgencySignals: UrgencySignalInsight[];
+  buyingTriggers: BuyingTriggerInsight[];
+  featureHypotheses: FeatureHypothesisInsight[];
+  risks: RiskInsight[];
+  openQuestions: OpenQuestionInsight[];
+  pilotSuccessCriteria: PilotSuccessCriterionInsight[];
+  recommendedExperiments: RecommendedExperimentInsight[];
+  decisionRecommendations: DecisionRecommendationInsight[];
   qualityFlags: QualityFlag[];
 }
 
-interface ExtractedInsight {
-  type: InsightType;
+interface ExtractionInsightBase {
   title: string;
   summary: string;
   evidence: EvidenceSnippet[];
-  confidence: 'low' | 'medium' | 'high';
-  reviewStatus: ReviewStatus;
-  decisionRecommendation?: DecisionRecommendation;
-  tags: string[];
+  confidence: Confidence;
+  evidenceStrength: EvidenceStrength;
+  directlyStated: boolean;
 }
 
 interface EvidenceSnippet {
-  sourceNoteId: string;
   quote: string;
-  reason: string;
+  whyItMatters: string;
+}
+
+interface PersonaInsight extends ExtractionInsightBase { segment: string; }
+interface UserJobInsight extends ExtractionInsightBase { jobStatement: string; }
+interface PainPointInsight extends ExtractionInsightBase { urgency: Urgency; }
+interface WorkaroundInsight extends ExtractionInsightBase { currentApproach: string; }
+interface UrgencySignalInsight extends ExtractionInsightBase { urgency: Urgency; }
+interface BuyingTriggerInsight extends ExtractionInsightBase { trigger: string; }
+interface FeatureHypothesisInsight extends ExtractionInsightBase { hypothesis: string; }
+interface RiskInsight extends ExtractionInsightBase { risk: string; }
+interface OpenQuestionInsight extends ExtractionInsightBase { question: string; }
+interface PilotSuccessCriterionInsight extends ExtractionInsightBase { criterion: string; }
+interface RecommendedExperimentInsight extends ExtractionInsightBase { experiment: string; }
+interface DecisionRecommendationInsight extends ExtractionInsightBase {
+  decision: DecisionRecommendation;
 }
 
 interface QualityFlag {
   title: string;
   summary: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: Urgency;
 }
 ```
 
@@ -101,7 +119,7 @@ Confidence should reflect evidence strength, repetition, specificity, and ambigu
 
 ## Review Status Lifecycle
 
-Default AI output starts as `draft`. A human can move an insight to `accepted`, `edited`, `rejected`, or `needs_follow_up`.
+Default persisted AI output starts as `ai_generated`. The review workflow can move an insight through accepted, edited, rejected, or needs-follow-up states.
 
 ## Prompt Requirements
 
@@ -120,6 +138,8 @@ If output is malformed, unsupported, missing evidence, or missing required field
 
 Validation belongs on the backend before persistence. Prefer explicit schemas, enums, and bounded text fields over loose `any` shapes.
 
+The current implementation uses a backend-local runtime parser for `design_partner_extraction.v1`. Mock and OpenAI extraction output is parsed before `InsightItem` records are created. Validation failure marks the extraction run as failed with safe metadata and does not expose raw output to frontend responses.
+
 Raw provider errors should be normalized before reaching the frontend. The UI should receive a safe message such as "Extraction failed. Please retry or review the input." rather than provider stack traces, raw payloads, or internal validation traces.
 
 ## Logging And Error Handling
@@ -128,7 +148,7 @@ Avoid logging raw note contents, prompts, API keys, or full provider responses. 
 
 Errors returned to the frontend should be sanitized and actionable. Do not expose provider stack traces, raw provider payloads, or internal validation traces.
 
-Persisting raw AI responses is allowed only as an explicit local/debug choice. Revisit or remove raw response persistence before any deployment that can handle real user data.
+Persisting full raw AI responses is out of scope for the current implementation. If a future local/debug feature stores them, it must be explicit and revisited before any deployment that can handle real user data.
 
 ## No Ungrounded Recommendations
 

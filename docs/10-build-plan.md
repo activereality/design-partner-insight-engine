@@ -133,15 +133,17 @@ Suggested commit: `feat(ai): add mock extraction workflow`
 
 ## 8. Extraction Schema Validation
 
+Status: completed for the mock provider with a backend-local runtime parser.
+
 Goal: validate provider output.
 
-Scope: schema validation and failure handling.
+Scope: versioned extraction contract constants/types, runtime validation, mock output shaped to `design_partner_extraction.v1`, schema-to-insight mapping, and focused validation tests.
 
 Out of scope: provider expansion.
 
-Likely files: validation helpers, tests.
+Likely files: extraction contract, validation helper/parser, mock extractor, extraction service, tests.
 
-Verification: invalid output fails clearly and is not saved.
+Verification: valid mock output validates, invalid output fails validation, and persisted insights are mapped only from validated output.
 
 Security notes: reject loose provider output and return sanitized validation errors.
 Security verification: malformed provider output is rejected, raw provider errors are not exposed to UI, and raw debug payloads are omitted from default DTOs.
@@ -150,50 +152,58 @@ Suggested commit: `feat(ai): validate extraction schema`
 
 ## 9. OpenAI Provider
 
+Status: completed as an optional server-side provider behind the extraction provider abstraction.
+
 Goal: add optional OpenAI adapter.
 
-Scope: provider adapter behind existing interface.
+Scope: provider interface, mock provider wrapper, OpenAI provider using the official SDK and Responses API, environment validation, provider selection, tests for mock default and OpenAI config gating, and provider-neutral UI copy.
 
-Out of scope: making OpenAI required.
+Out of scope: making OpenAI required, Anthropic/Gemini providers, streaming, retries/backoff, provider comparison UI, dashboard, review workflow, auth, and seed/reset.
 
 Likely files: provider adapter, config, tests with mocked calls.
 
-Verification: mock remains default; OpenAI path can be configured.
+Verification: mock remains default; OpenAI path can be configured with server-side env vars; tests pass without `OPENAI_API_KEY`.
 
 Security notes: use environment variables for keys, never expose raw provider responses to the frontend, and keep mock as the safe default.
-Security verification: provider key is server-side only, `.env` is absent, `.env.example` documents config if needed, and tests/mock calls do not require real secrets.
+Security verification: provider key is server-side only, `.env` is absent, `.env.example` documents safe placeholders, tests/mock calls do not require real secrets, and normal responses omit raw provider responses/internal payloads.
 
 Suggested commit: `feat(ai): add openai provider adapter`
 
 ## 10. Review/Edit/Accept Workflow
 
+Status: completed as the first human-in-the-loop insight review workflow.
+
 Goal: make insights human-reviewable.
 
-Scope: UI controls and API update endpoint.
+Scope: insight review status endpoints, bounded insight edit DTO, persisted review metadata, note-detail review controls, inline edit form, and safe review status display.
 
-Out of scope: dashboard polish.
+Out of scope: dashboard aggregation, auth, audit logging, seed/reset, provider comparison UI, and changing extraction behavior.
 
-Likely files: insight API module and review components.
+Likely files: insight API module, insight DTO/schema/response mapper, web extraction API client, note detail review components, README/docs updates.
 
-Verification: edit and status changes persist.
+Verification: edit and status changes persist; accepted, rejected, needs-follow-up, and edited states render in the note detail workflow.
 
-Security verification: update DTO allows only intended fields, insight lookup is scoped by project ID, and internal payload/raw response fields are not editable from the client.
+Security notes: keep review actions metadata-only, do not log review edits or evidence, and continue omitting internal `payload` and extraction `rawResponse` from normal responses.
+Security verification: update DTO allows only intended fields, review endpoints do not accept ownership/project scope fields, internal payload/raw response fields are not editable from the client, and insight responses still omit `payload`.
 
 Suggested commit: `feat: add insight review workflow`
 
 ## 11. Dashboard Aggregation
 
-Goal: summarize accepted and draft discovery signal.
+Status: completed as a reviewed-signal product dashboard.
 
-Scope: computed dashboard endpoint and UI.
+Goal: summarize reviewed discovery signal into product-decision views.
 
-Out of scope: advanced analytics.
+Scope: project-scoped dashboard endpoint, pure aggregation rules, reviewed-signal counts, decision recommendation buckets, note-count context, and `/projects/:projectId` dashboard UI.
 
-Likely files: dashboard service and page.
+Out of scope: advanced analytics, charting libraries, historical snapshots, exports, audit logs, auth, seed/reset, deployment, and CI.
 
-Verification: dashboard reflects current InsightItem data.
+Likely files: dashboard service/controller/module, dashboard aggregation helper, dashboard API client, project detail page, docs/readmes.
 
-Security verification: aggregation queries are scoped by project ID and dashboard DTOs do not include raw provider/debug payloads.
+Verification: dashboard reflects current `InsightItem` review statuses, accepted/edited insights appear as primary signal, needs-follow-up appears separately, rejected insights are excluded from primary recommendations, and unreviewed AI-generated insights are not presented as final decisions.
+
+Security notes: dashboard responses must stay project-scoped and compact. Internal `payload`, extraction `rawResponse`, full note `rawText`, provider details, and raw provider output remain server-side.
+Security verification: aggregation queries are scoped by project ID, route params are validated, dashboard DTOs omit raw provider/debug payloads and full note text, and frontend errors remain generic.
 
 Suggested commit: `feat: add discovery dashboard`
 

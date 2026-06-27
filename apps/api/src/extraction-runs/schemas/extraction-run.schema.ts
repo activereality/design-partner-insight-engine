@@ -9,7 +9,7 @@ export type ExtractionRunDocument = HydratedDocument<ExtractionRun>;
 export interface ExtractionRunRawResponse {
   kind: 'mock_metadata';
   insightCount: number;
-  noteTitle: string;
+  schemaVersion: string;
 }
 
 @Schema({ timestamps: true })

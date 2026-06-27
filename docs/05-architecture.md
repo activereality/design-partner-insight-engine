@@ -43,9 +43,9 @@ Queries should be scoped by `projectId` even before auth exists. Avoid trusting 
 
 ## AI Provider Architecture
 
-Backend services should call an AI extraction interface. The mock adapter returns deterministic synthetic results. Future adapters can call OpenAI, Anthropic, or Gemini without changing the API contract.
+Backend services call an AI extraction interface. The mock adapter returns deterministic synthetic results and remains the default. The OpenAI adapter is optional and server-side only. Future Anthropic or Gemini adapters can fit behind the same interface without changing controllers or frontend API contracts.
 
-Provider keys stay server-side in environment variables. Raw provider responses should be validated and normalized before persistence or frontend exposure.
+Provider keys stay server-side in environment variables. Provider output is validated and normalized before persistence. Raw provider responses, prompts, provider errors, and internal debug payloads are not exposed to the frontend.
 
 ## Runtime Flow
 
@@ -56,7 +56,7 @@ Provider keys stay server-side in environment variables. Raw provider responses 
 5. API validates the extraction result.
 6. API saves draft InsightItem documents.
 7. User reviews, edits, accepts, rejects, or marks follow-up.
-8. Dashboard aggregates accepted and draft insight state.
+8. Dashboard aggregates accepted and edited insight state as primary signal, while keeping follow-up and unreviewed AI signal separate.
 
 ## Security-Forward Architecture
 
@@ -77,7 +77,8 @@ Future variables may include:
 - `MONGODB_URI`
 - `AI_PROVIDER`
 - `OPENAI_API_KEY`
-- provider-specific model names
+- `OPENAI_MODEL`
+- provider-specific model names for future adapters
 
 No `.env` file should be committed. Add `.env.example` only when configuration is introduced.
 

@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 
 import { MongoObjectIdPipe } from '../common/pipes/mongo-object-id.pipe';
+import { UpdateInsightDto } from './dto/update-insight.dto';
 import { InsightItemResponse } from './insight-item.response';
 import { InsightsService } from './insights.service';
 
@@ -25,5 +26,30 @@ export class InsightsController {
     @Param('insightId', MongoObjectIdPipe) insightId: string
   ): Promise<InsightItemResponse> {
     return this.insightsService.findOne(insightId);
+  }
+
+  @Post('insights/:insightId/accept')
+  accept(@Param('insightId', MongoObjectIdPipe) insightId: string): Promise<InsightItemResponse> {
+    return this.insightsService.accept(insightId);
+  }
+
+  @Post('insights/:insightId/reject')
+  reject(@Param('insightId', MongoObjectIdPipe) insightId: string): Promise<InsightItemResponse> {
+    return this.insightsService.reject(insightId);
+  }
+
+  @Post('insights/:insightId/needs-follow-up')
+  needsFollowUp(
+    @Param('insightId', MongoObjectIdPipe) insightId: string
+  ): Promise<InsightItemResponse> {
+    return this.insightsService.needsFollowUp(insightId);
+  }
+
+  @Patch('insights/:insightId')
+  update(
+    @Param('insightId', MongoObjectIdPipe) insightId: string,
+    @Body() dto: UpdateInsightDto
+  ): Promise<InsightItemResponse> {
+    return this.insightsService.update(insightId, dto);
   }
 }

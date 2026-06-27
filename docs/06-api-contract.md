@@ -16,27 +16,31 @@ This is the REST contract for the current and planned API surface.
 
 ## Health
 
-### `GET /health`
+### `GET /api/health`
 
 Purpose: confirm the API is running.
 
 Response:
 
 ```json
-{ "status": "ok" }
+{
+  "status": "ok",
+  "service": "signalforge-api",
+  "database": "connected"
+}
 ```
 
-MVP notes: no dependency checks required at first.
+MVP notes: return safe dependency status only.
 
 ## Projects
 
-### `GET /projects`
+### `GET /api/projects`
 
 Purpose: list projects.
 
 Response shape: array of project summaries.
 
-### `POST /projects`
+### `POST /api/projects`
 
 Purpose: create a project.
 
@@ -48,7 +52,7 @@ Request shape:
 
 Validation: `name` is required and bounded.
 
-### `GET /projects/:projectId`
+### `GET /api/projects/:projectId`
 
 Purpose: return project detail.
 
@@ -58,13 +62,13 @@ MVP notes: future auth can filter project access at this boundary.
 
 ## Notes
 
-### `GET /projects/:projectId/notes`
+### `GET /api/projects/:projectId/notes`
 
 Purpose: list research notes for a project.
 
 Response shape: array of note summaries. Summaries must not include full `rawText`; they may include a short `rawTextPreview` capped to a safe length.
 
-### `POST /projects/:projectId/notes`
+### `POST /api/projects/:projectId/notes`
 
 Purpose: add a synthetic research note.
 
@@ -84,66 +88,100 @@ Response shape: note summary without full `rawText`.
 
 MVP notes: do not log full note content by default.
 
-### `GET /notes/:noteId`
+### `GET /api/notes/:noteId`
 
 Purpose: return research note detail for viewing/editing.
 
 Response shape: note detail including full `rawText`.
 
-### `PATCH /notes/:noteId`
+### `PATCH /api/notes/:noteId`
 
 Purpose: update research note metadata or raw text.
 
 Response shape: note detail including full `rawText`, because the edit workflow needs the saved value.
 
-### `DELETE /notes/:noteId`
+### `DELETE /api/notes/:noteId`
 
 Purpose: delete a research note without deleting its project.
 
 ## Extraction
 
-### `POST /projects/:projectId/extraction-runs`
+### `POST /api/notes/:noteId/extract`
 
-Purpose: start extraction for selected notes.
+Purpose: start extraction for one research note.
+
+Response shape: extraction run summary with status.
+
+MVP notes: derive `projectId` from the note server-side and run synchronously for the mock provider.
+
+Validation: `noteId` must be a valid ObjectId. Do not accept provider credentials from the client.
+
+### `GET /api/extraction-runs/:runId`
+
+Purpose: inspect extraction status and errors.
+
+MVP notes: expose normalized status and sanitized error messages only. Do not expose `rawResponse`.
+
+## Insights
+
+### `GET /api/projects/:projectId/insights`
+
+Purpose: list extracted insights with filters.
+
+Response shape: array of insight DTOs without internal `payload`.
+
+### `GET /api/notes/:noteId/insights`
+
+Purpose: list extracted insights for one note.
+
+Response shape: array of insight DTOs without internal `payload`.
+
+### `GET /api/insights/:insightId`
+
+Purpose: return one insight.
+
+Response shape: insight DTO without internal `payload`.
+
+### `PATCH /api/insights/:insightId`
+
+Purpose: edit human-reviewable insight fields.
 
 Request shape:
 
 ```json
-{ "researchNoteIds": ["..."], "provider": "mock" }
+{
+  "title": "Edited insight title",
+  "summary": "Edited insight summary",
+  "reviewNotes": "Optional reviewer note"
+}
 ```
 
-Response shape: extraction run summary with status.
-
-MVP notes: run synchronously for the mock provider.
-
-Validation: note IDs must belong to the route project. Provider must be an allowed enum. Do not accept provider credentials from the client.
-
-### `GET /projects/:projectId/extraction-runs/:runId`
-
-Purpose: inspect extraction status and errors.
-
-MVP notes: expose normalized status and sanitized error messages only.
-
-## Insights
-
-### `GET /projects/:projectId/insights`
-
-Purpose: list extracted insights with filters.
-
-Query options: `type`, `reviewStatus`, `decisionRecommendation`.
-
-### `PATCH /projects/:projectId/insights/:insightId`
-
-Purpose: edit insight title, summary, tags, review status, or decision recommendation.
-
 Validation: only allowed fields can be updated.
-DTO expectations: `reviewStatus`, `confidence`, `type`, and `decisionRecommendation` use enums; free-text fields are bounded.
+DTO expectations: `title`, `summary`, and `reviewNotes` are bounded free-text fields. The client cannot edit `payload`, evidence, extraction metadata, project scope, note scope, provider details, or raw provider output.
 
-MVP notes: verify the insight belongs to the route project before updating.
+MVP notes: editing title or summary marks a non-final insight as `edited` and preserves generated originals server-side.
+
+### `POST /api/insights/:insightId/accept`
+
+Purpose: mark an insight accepted by a human reviewer.
+
+Response shape: updated insight DTO with `reviewStatus: "accepted"` and `reviewedAt`.
+
+### `POST /api/insights/:insightId/reject`
+
+Purpose: mark an insight rejected by a human reviewer.
+
+Response shape: updated insight DTO with `reviewStatus: "rejected"` and `reviewedAt`.
+
+### `POST /api/insights/:insightId/needs-follow-up`
+
+Purpose: mark an insight as needing more discovery before acceptance.
+
+Response shape: updated insight DTO with `reviewStatus: "needs_follow_up"` and `reviewedAt`.
 
 ## Dashboard
 
-### `GET /projects/:projectId/dashboard`
+### `GET /api/projects/:projectId/dashboard`
 
 Purpose: return computed summary data.
 
@@ -151,20 +189,39 @@ Response shape:
 
 ```json
 {
+  "project": {},
+  "noteCount": 3,
+  "insightCount": 12,
   "countsByType": {},
-  "topPainPoints": [],
+  "countsByReviewStatus": {},
+  "primarySignalCount": 5,
+  "unresolvedSignalCount": 2,
+  "unreviewedSignalCount": 4,
+  "rejectedSignalCount": 1,
+  "strongestPainPoints": [],
+  "topPersonas": [],
+  "topUserJobs": [],
+  "featureHypotheses": [],
+  "risks": [],
+  "openQuestions": [],
+  "pilotSuccessCriteria": [],
   "recommendedExperiments": [],
-  "decisionSummary": {}
+  "needsFollowUp": [],
+  "decisionRecommendations": {
+    "buildNow": [],
+    "learnMore": [],
+    "ignoreForNow": []
+  }
 }
 ```
 
-MVP notes: compute from current InsightItem documents.
+MVP notes: compute from current `InsightItem` documents. Accepted and edited insights are primary signal. Needs-follow-up insights are unresolved signal. AI-generated insights are unreviewed signal. Rejected insights are counted but excluded from primary recommendations.
 
-Validation: dashboard reads should be scoped by project ID.
+Validation: dashboard reads must validate `projectId` and scope all queries by project ID. Dashboard DTOs must omit full note `rawText`, internal insight `payload`, extraction `rawResponse`, raw provider output, provider details, and secrets.
 
 ## Demo Seed/Reset
 
-### `POST /demo/reset`
+### `POST /api/demo/reset`
 
 Purpose: reset the local synthetic demo scenario.
 

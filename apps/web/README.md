@@ -19,7 +19,7 @@ Vite + React + TypeScript frontend for SignalForge, the Design Partner Insight E
 - `/projects/:projectId`
 - `/projects/:projectId/notes/:noteId`
 
-The note detail route can run deterministic mock extraction and display generated insight cards grouped by type.
+The project detail route renders a reviewed-signal dashboard and synthetic note intake. The note detail route can run extraction, display generated insight cards grouped by type, and support human review actions: accept, reject, needs follow-up, and bounded title/summary/review-note edits.
 
 ## Configuration
 
@@ -35,14 +35,14 @@ Copy `.env.example` to `.env` for local overrides if needed. Never put backend s
 - Raw backend errors, stack traces, connection strings, provider responses, and secrets are not shown.
 - Do not enter or commit real customer notes, private interview details, recruiter messages, employer data, or private Gitwit/Mechro details.
 - Project and note forms are for synthetic/demo content only.
-- The mock extraction UI calls the backend only; no real provider key or provider response is exposed to the frontend.
+- The extraction UI calls the backend only; no provider key or raw provider response is exposed to the frontend.
 - Generated evidence snippets are displayed for review context and should still be treated as potentially sensitive.
+- Review edits and reviewer notes are treated as potentially source-derived content; the UI does not log them or expose internal payloads.
+- Dashboard UI displays safe aggregated DTOs only and does not receive internal payloads, raw provider responses, provider details, or full note text.
 
 ## Intentionally Not Implemented Yet
 
-- Insight review UI
-- Dashboard UI
 - Authentication
-- Real AI provider extraction UI
+- Provider comparison UI
 - Demo seed/reset UI
 - TanStack Query

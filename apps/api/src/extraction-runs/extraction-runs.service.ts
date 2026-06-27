@@ -4,16 +4,19 @@ import { Model, Types } from 'mongoose';
 
 import { InsightItem } from '../insights/schemas/insight-item.schema';
 import { ResearchNote, ResearchNoteDocument } from '../notes/schemas/research-note.schema';
+import {
+  DESIGN_PARTNER_EXTRACTION_SCHEMA_VERSION,
+  ExtractionValidationError,
+  MOCK_EXTRACTION_MODEL,
+  MOCK_EXTRACTION_PROMPT_VERSION,
+  parseDesignPartnerExtraction
+} from './design-partner-extraction.contract';
+import { mapExtractionToInsightDrafts } from './design-partner-extraction.mapper';
 import { ExtractionRunResponse, toExtractionRunResponse } from './extraction-run.response';
-import { ExtractionProvider } from './enums/extraction-provider.enum';
 import { ExtractionRunStatus } from './enums/extraction-run-status.enum';
-import { MockExtractionService } from './mock-extraction.service';
+import { InsightExtractionProviderSelector } from './providers/insight-extraction-provider.selector';
 import { ExtractionRun, ExtractionRunDocument } from './schemas/extraction-run.schema';
 import { InsightItemResponse, toInsightItemResponse } from '../insights/insight-item.response';
-
-const MOCK_MODEL = 'mock-design-partner-extractor';
-const PROMPT_VERSION = 'mock_prompt.v1';
-const SCHEMA_VERSION = 'design_partner_extraction.v1';
 
 export interface ExtractionResultResponse {
   run: ExtractionRunResponse;
@@ -26,7 +29,7 @@ export class ExtractionRunsService {
     @InjectModel(ExtractionRun.name) private readonly runModel: Model<ExtractionRun>,
     @InjectModel(InsightItem.name) private readonly insightModel: Model<InsightItem>,
     @InjectModel(ResearchNote.name) private readonly noteModel: Model<ResearchNote>,
-    private readonly mockExtractionService: MockExtractionService
+    private readonly providerSelector: InsightExtractionProviderSelector
   ) {}
 
   async findOne(runId: string): Promise<ExtractionRunResponse> {
@@ -36,26 +39,30 @@ export class ExtractionRunsService {
 
   async extractNote(noteId: string): Promise<ExtractionResultResponse> {
     const note = await this.findNoteDocument(noteId);
+    const provider = this.providerSelector.select();
     const now = new Date();
     const run = await this.runModel.create({
       projectId: note.projectId,
       noteId: note._id,
       status: ExtractionRunStatus.Running,
-      provider: ExtractionProvider.Mock,
-      model: MOCK_MODEL,
-      promptVersion: PROMPT_VERSION,
-      schemaVersion: SCHEMA_VERSION,
+      provider: provider.provider,
+      model: provider.model,
+      promptVersion: provider.promptVersion,
+      schemaVersion: provider.schemaVersion,
       startedAt: now
     });
 
     try {
-      const drafts = this.mockExtractionService.extract(note);
+      const extraction = parseDesignPartnerExtraction(await provider.extract({ note }));
+      const drafts = mapExtractionToInsightDrafts(extraction, note._id.toString());
       const createdInsights = await this.insightModel.insertMany(
         drafts.map((draft) => ({
           ...draft,
           projectId: note.projectId,
           noteId: note._id,
-          extractionRunId: run._id
+          extractionRunId: run._id,
+          originalTitle: draft.title,
+          originalSummary: draft.summary
         }))
       );
 
@@ -67,7 +74,7 @@ export class ExtractionRunsService {
             rawResponse: {
               insightCount: createdInsights.length,
               kind: 'mock_metadata',
-              noteTitle: note.title
+              schemaVersion: extraction.schemaVersion
             },
             status: ExtractionRunStatus.Succeeded
           },
@@ -87,7 +94,10 @@ export class ExtractionRunsService {
       await this.runModel
         .findByIdAndUpdate(run._id, {
           completedAt: new Date(),
-          errorMessage: 'Mock extraction failed',
+          errorMessage:
+            error instanceof ExtractionValidationError
+              ? 'Extraction output failed validation'
+              : 'Mock extraction failed',
           status: ExtractionRunStatus.Failed
         })
         .exec();

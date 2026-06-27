@@ -2,8 +2,12 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import {
+  acceptInsight,
   listNoteInsights,
-  runMockExtraction,
+  markInsightNeedsFollowUp,
+  rejectInsight,
+  runExtraction,
+  updateInsight,
   type ExtractionRun,
   type InsightItem
 } from '../api/extraction';
@@ -23,6 +27,13 @@ interface NoteEditState {
   occurredAt: string;
 }
 
+interface InsightEditState {
+  insightId: string;
+  title: string;
+  summary: string;
+  reviewNotes: string;
+}
+
 function toDateInputValue(value: string): string {
   return value.slice(0, 10);
 }
@@ -39,6 +50,10 @@ export function NoteDetailPage() {
   const [extractionStatus, setExtractionStatus] = useState<
     'idle' | 'running' | 'succeeded' | 'error'
   >('idle');
+  const [insightActionStatus, setInsightActionStatus] = useState<'idle' | 'saving' | 'error'>(
+    'idle'
+  );
+  const [editingInsight, setEditingInsight] = useState<InsightEditState | null>(null);
 
   useEffect(() => {
     if (!noteId) {
@@ -112,7 +127,7 @@ export function NoteDetailPage() {
     setExtractionStatus('running');
 
     try {
-      const result = await runMockExtraction(noteId);
+      const result = await runExtraction(noteId);
       setLatestRun(result.run);
       setInsights(result.insights);
       setExtractionStatus('succeeded');
@@ -120,6 +135,62 @@ export function NoteDetailPage() {
     } catch {
       setExtractionStatus('error');
     }
+  }
+
+  async function onReviewAction(
+    insightId: string,
+    action: 'accept' | 'reject' | 'needs_follow_up'
+  ) {
+    setInsightActionStatus('saving');
+
+    try {
+      const updated =
+        action === 'accept'
+          ? await acceptInsight(insightId)
+          : action === 'reject'
+            ? await rejectInsight(insightId)
+            : await markInsightNeedsFollowUp(insightId);
+      replaceInsight(updated);
+      setInsightActionStatus('idle');
+    } catch {
+      setInsightActionStatus('error');
+    }
+  }
+
+  async function onSaveInsightEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingInsight) {
+      return;
+    }
+
+    setInsightActionStatus('saving');
+
+    try {
+      const updated = await updateInsight(editingInsight.insightId, {
+        title: editingInsight.title,
+        summary: editingInsight.summary,
+        ...(editingInsight.reviewNotes ? { reviewNotes: editingInsight.reviewNotes } : {})
+      });
+      replaceInsight(updated);
+      setEditingInsight(null);
+      setInsightActionStatus('idle');
+    } catch {
+      setInsightActionStatus('error');
+    }
+  }
+
+  function replaceInsight(updated: InsightItem) {
+    setInsights((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+  }
+
+  function startEditingInsight(insight: InsightItem) {
+    setEditingInsight({
+      insightId: insight.id,
+      title: insight.title,
+      summary: insight.summary,
+      reviewNotes: insight.reviewNotes ?? ''
+    });
   }
 
   const insightsByType = insights.reduce<Record<string, InsightItem[]>>((groups, insight) => {
@@ -220,7 +291,7 @@ export function NoteDetailPage() {
       <section className="content-panel" aria-labelledby="mock-extraction-title">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Mock extraction</p>
+            <p className="eyebrow">Extraction</p>
             <h2 id="mock-extraction-title">Generated insights</h2>
           </div>
           <button
@@ -229,12 +300,12 @@ export function NoteDetailPage() {
             onClick={onRunExtraction}
             type="button"
           >
-            {extractionStatus === 'running' ? 'Running...' : 'Run Mock Extraction'}
+            {extractionStatus === 'running' ? 'Running...' : 'Run Extraction'}
           </button>
         </div>
 
         <p className="subtle-note">
-          This uses deterministic mock output only. No real AI provider is called, and review/edit/accept arrives in a later slice.
+          Uses the mock provider unless the API is configured for OpenAI. AI proposes; humans decide. Dashboard aggregation arrives in a later slice.
         </p>
 
         {latestRun && (
@@ -251,7 +322,10 @@ export function NoteDetailPage() {
         )}
 
         {extractionStatus === 'error' && (
-          <p className="safe-error">Mock extraction could not run. Check the local API connection.</p>
+          <p className="safe-error">Extraction could not run. Check the local API connection.</p>
+        )}
+        {insightActionStatus === 'error' && (
+          <p className="safe-error">Insight review changes could not be saved. Try again.</p>
         )}
 
         {insightStatus === 'loading' && <p>Loading generated insights.</p>}
@@ -268,11 +342,14 @@ export function NoteDetailPage() {
                 <h3>{type}</h3>
                 <div className="insight-list">
                   {items.map((insight) => (
-                    <article className="insight-card" key={insight.id}>
+                    <article
+                      className={`insight-card review-${insight.reviewStatus}`}
+                      key={insight.id}
+                    >
                       <div className="section-heading compact-heading">
                         <div>
                           <strong>{insight.title}</strong>
-                          <small>{insight.reviewStatus}</small>
+                          <small>{formatReviewStatus(insight.reviewStatus)}</small>
                         </div>
                         <span className="status-pill">
                           {Math.round(insight.confidence * 100)}%
@@ -287,6 +364,106 @@ export function NoteDetailPage() {
                           ))}
                         </div>
                       )}
+                      {insight.reviewNotes && (
+                        <p className="review-note">Review note: {insight.reviewNotes}</p>
+                      )}
+                      <div className="review-actions">
+                        <button
+                          className="button secondary"
+                          disabled={insightActionStatus === 'saving'}
+                          onClick={() => onReviewAction(insight.id, 'accept')}
+                          type="button"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="button secondary"
+                          disabled={insightActionStatus === 'saving'}
+                          onClick={() => onReviewAction(insight.id, 'reject')}
+                          type="button"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          className="button secondary"
+                          disabled={insightActionStatus === 'saving'}
+                          onClick={() => onReviewAction(insight.id, 'needs_follow_up')}
+                          type="button"
+                        >
+                          Needs follow-up
+                        </button>
+                        <button
+                          className="button secondary"
+                          disabled={insightActionStatus === 'saving'}
+                          onClick={() => startEditingInsight(insight)}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      {editingInsight?.insightId === insight.id && (
+                        <form className="stacked-form compact-form" onSubmit={onSaveInsightEdit}>
+                          <label>
+                            Insight title
+                            <input
+                              maxLength={160}
+                              onChange={(event) =>
+                                setEditingInsight({
+                                  ...editingInsight,
+                                  title: event.target.value
+                                })
+                              }
+                              required
+                              value={editingInsight.title}
+                            />
+                          </label>
+                          <label>
+                            Summary
+                            <textarea
+                              maxLength={1000}
+                              onChange={(event) =>
+                                setEditingInsight({
+                                  ...editingInsight,
+                                  summary: event.target.value
+                                })
+                              }
+                              required
+                              rows={4}
+                              value={editingInsight.summary}
+                            />
+                          </label>
+                          <label>
+                            Review notes
+                            <textarea
+                              maxLength={1000}
+                              onChange={(event) =>
+                                setEditingInsight({
+                                  ...editingInsight,
+                                  reviewNotes: event.target.value
+                                })
+                              }
+                              rows={3}
+                              value={editingInsight.reviewNotes}
+                            />
+                          </label>
+                          <div className="review-actions">
+                            <button
+                              className="button primary"
+                              disabled={insightActionStatus === 'saving'}
+                              type="submit"
+                            >
+                              Save edit
+                            </button>
+                            <button
+                              className="button secondary"
+                              onClick={() => setEditingInsight(null)}
+                              type="button"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      )}
                     </article>
                   ))}
                 </div>
@@ -297,4 +474,18 @@ export function NoteDetailPage() {
       </section>
     </main>
   );
+}
+
+function formatReviewStatus(reviewStatus: string): string {
+  switch (reviewStatus) {
+    case 'ai_generated':
+      return 'AI generated';
+    case 'needs_follow_up':
+      return 'Needs follow-up';
+    default:
+      return reviewStatus
+        .split('_')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+  }
 }

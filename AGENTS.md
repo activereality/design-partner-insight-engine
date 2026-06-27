@@ -28,7 +28,7 @@ SignalForge turns messy founder, customer, and design-partner notes into structu
 - MongoDB + Mongoose persistence
 - AI provider abstraction
 - Mock AI provider first
-- OpenAI provider later
+- Optional OpenAI provider server-side
 - Leave room for Anthropic and Gemini providers later
 - Docker Compose for local MongoDB
 - GitHub Actions later for CI
@@ -92,4 +92,4 @@ Future slices should include the most relevant checks for the touched surface: l
 
 ## Current Scaffold
 
-This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a NestJS API with MongoDB/Mongoose, projects/notes CRUD, deterministic mock extraction, generated insight records, and a Vite React frontend with projects/notes/mock-extraction workflow screens. Do not add real AI provider code, insight review/edit/accept, dashboard aggregation, CI files, auth, or seed data until explicitly requested.
+This repository currently contains docs, repo-local Codex/agent guidance, root pnpm workspace tooling, shared TypeScript config, a NestJS API with MongoDB/Mongoose, projects/notes CRUD, validated extraction, generated insight records, mock-default provider selection, optional server-side OpenAI extraction, human review/edit/accept/reject/follow-up workflow, a project dashboard aggregation endpoint, and a Vite React frontend with projects/notes/extraction/review/dashboard screens. Do not add Anthropic/Gemini providers, CI files, auth, deployment, or seed data until explicitly requested.
