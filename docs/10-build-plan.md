@@ -209,17 +209,20 @@ Suggested commit: `feat: add discovery dashboard`
 
 ## 12. Demo Seed/Reset
 
+Status: completed as gated synthetic OnboardIQ demo tooling.
+
 Goal: reset local demo data.
 
-Scope: OnboardIQ seed scenario and reset endpoint/action.
+Scope: OnboardIQ seed scenario, `POST /api/demo/seed`, `POST /api/demo/reset`, `DEMO_TOOLS_ENABLED` gate, marked demo-data reset safety, deterministic mock extraction records, reviewed insight states, and home-page demo controls.
 
-Out of scope: production data migration.
+Out of scope: production data migration, auth, multi-user demo data, CI, deployment, real provider calls during seed, analytics, screenshots, export/reporting, and audit logs.
 
-Likely files: seed service and UI action.
+Likely files: demo module/service/controller, demo fixture data, project demo markers, home-page demo controls, README/docs updates.
 
-Verification: reset produces predictable synthetic data.
+Verification: disabled endpoints fail safely, enabled seed creates one deterministic OnboardIQ project with 3 notes and dashboard-ready reviewed signal, re-running seed does not create duplicate demo projects, and reset removes only marked demo data.
 
-Security verification: seed data is fictional, reset does not touch non-demo records, and no private notes or real company/person data appear in fixtures.
+Security notes: demo tools are disabled by default, blocked in production, synthetic-only, and never call real AI providers.
+Security verification: seed data is fictional, reset does not touch non-demo records, no private notes or real company/person data appear in fixtures, no `.env` is committed, and dashboard/note responses still omit sensitive internal fields.
 
 Suggested commit: `feat(demo): add synthetic seed reset`
 

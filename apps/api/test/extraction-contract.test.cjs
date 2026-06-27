@@ -81,6 +81,7 @@ test('environment validation defaults AI provider to mock', () => {
   });
 
   assert.equal(env.AI_PROVIDER, 'mock');
+  assert.equal(env.DEMO_TOOLS_ENABLED, false);
 });
 
 test('environment validation requires OpenAI config only when OpenAI is selected', () => {
@@ -106,4 +107,26 @@ test('environment validation requires OpenAI config only when OpenAI is selected
 
   assert.equal(env.AI_PROVIDER, 'openai');
   assert.equal(env.OPENAI_MODEL, 'test-only-model');
+});
+
+test('environment validation parses demo tools flag explicitly', () => {
+  const env = validateEnvironment({
+    DEMO_TOOLS_ENABLED: 'true',
+    PORT: '3000',
+    NODE_ENV: 'test',
+    MONGODB_URI: 'mongodb://localhost:27017/signalforge'
+  });
+
+  assert.equal(env.DEMO_TOOLS_ENABLED, true);
+
+  assert.throws(
+    () =>
+      validateEnvironment({
+        DEMO_TOOLS_ENABLED: 'yes',
+        PORT: '3000',
+        NODE_ENV: 'test',
+        MONGODB_URI: 'mongodb://localhost:27017/signalforge'
+      }),
+    /DEMO_TOOLS_ENABLED/
+  );
 });

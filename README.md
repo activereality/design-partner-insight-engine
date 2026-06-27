@@ -38,7 +38,7 @@ Treat raw research notes, AI prompts, provider responses, extracted insights, an
 - Docker Compose for local MongoDB
 - GitHub Actions later for CI
 
-The API and frontend now support projects, notes, deterministic mock extraction, optional server-side OpenAI extraction, human review actions for generated insights, and a reviewed-signal project dashboard. Mock remains the default. Seed data, auth, deployment, and CI are still deferred.
+The API and frontend now support projects, notes, deterministic mock extraction, optional server-side OpenAI extraction, human review actions for generated insights, a reviewed-signal project dashboard, and gated synthetic demo seed/reset tools. Mock remains the default. Auth, deployment, and CI are still deferred.
 
 ## Local Setup
 
@@ -54,19 +54,19 @@ Current tooling scaffold:
 8. The API health check is `GET http://localhost:3000/api/health`.
 9. Frontend commands are available with `pnpm --filter @signalforge/web dev`, `pnpm --filter @signalforge/web build`, and `pnpm --filter @signalforge/web typecheck`.
 10. The frontend runs at `http://127.0.0.1:5173` by default.
+11. To use demo tools locally, set `DEMO_TOOLS_ENABLED=true` in uncommitted API environment configuration. Keep it `false` by default and never enable demo reset in production.
 
 ## Demo Flow
 
-1. Create a product discovery project.
-2. Paste or load synthetic messy design-partner notes.
-3. Run extraction from the note detail page. Local development uses the mock provider unless the API is configured for OpenAI.
-4. Review generated evidence-backed insight cards.
-5. Accept, reject, edit, or mark insights as needing follow-up.
-6. Return to the project dashboard to see reviewed signal grouped into decision recommendations and next discovery work.
+1. Enable local demo tools with `DEMO_TOOLS_ENABLED=true` in uncommitted API environment configuration.
+2. Use the home-page demo controls or `POST /api/demo/seed` to create the synthetic OnboardIQ workspace.
+3. Open the seeded project dashboard.
+4. Review the synthetic notes, mock extraction runs, human-reviewed insights, and decision recommendation sections.
+5. Use `POST /api/demo/reset` or the home-page reset control to remove only marked OnboardIQ demo records.
 
 ## Architecture Summary
 
-The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that defaults to deterministic mock output. The current implementation connects to local MongoDB and supports project-scoped synthetic projects, raw research notes, validated extraction runs, generated insight items, human review status/edit flows, reviewed-signal dashboard aggregation, and an optional server-side OpenAI provider. Seed/reset flows are still deferred.
+The intended app is a small full-stack TypeScript monorepo: React for the product workflow, NestJS for REST APIs and orchestration, MongoDB/Mongoose for flexible discovery documents, and an AI provider abstraction that defaults to deterministic mock output. The current implementation connects to local MongoDB and supports project-scoped synthetic projects, raw research notes, validated extraction runs, generated insight items, human review status/edit flows, reviewed-signal dashboard aggregation, gated synthetic demo seed/reset, and an optional server-side OpenAI provider.
 
 The current structure remains intentionally small and slice-based.
 
@@ -118,7 +118,7 @@ It is also not intended to process real customer data in this portfolio phase.
 9. Completed: optional OpenAI provider.
 10. Completed: review/edit/accept workflow.
 11. Completed: dashboard aggregation.
-12. Add demo seed/reset.
+12. Completed: demo seed/reset.
 13. Polish README and screenshots.
 14. Add CI.
 15. Optionally deploy.

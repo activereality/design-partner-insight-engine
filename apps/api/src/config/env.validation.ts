@@ -3,6 +3,7 @@ type AiProvider = 'mock' | 'openai';
 
 interface ValidatedEnvironment {
   AI_PROVIDER: AiProvider;
+  DEMO_TOOLS_ENABLED: boolean;
   MONGODB_URI: string;
   NODE_ENV: NodeEnv;
   OPENAI_API_KEY?: string;
@@ -20,6 +21,7 @@ export function validateEnvironment(config: EnvironmentInput): ValidatedEnvironm
   const port = parsePort(config.PORT);
   const nodeEnv = parseNodeEnv(config.NODE_ENV);
   const mongodbUri = parseMongoDbUri(config.MONGODB_URI);
+  const demoToolsEnabled = parseBoolean(config.DEMO_TOOLS_ENABLED, false, 'DEMO_TOOLS_ENABLED');
   const openAiApiKey = parseOptionalString(config.OPENAI_API_KEY);
   const openAiModel = parseOptionalString(config.OPENAI_MODEL);
 
@@ -29,6 +31,7 @@ export function validateEnvironment(config: EnvironmentInput): ValidatedEnvironm
 
   return {
     AI_PROVIDER: aiProvider,
+    DEMO_TOOLS_ENABLED: demoToolsEnabled,
     MONGODB_URI: mongodbUri,
     NODE_ENV: nodeEnv,
     ...(openAiApiKey ? { OPENAI_API_KEY: openAiApiKey } : {}),
@@ -86,4 +89,20 @@ function parseMongoDbUri(value: string | undefined): string {
 function parseOptionalString(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function parseBoolean(value: string | undefined, defaultValue: boolean, key: string): boolean {
+  if (!value) {
+    return defaultValue;
+  }
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  throw new Error(`${key} must be true or false`);
 }

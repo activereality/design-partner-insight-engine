@@ -3,75 +3,76 @@
 ## Synthetic Data Rules
 
 - Seed data must be fully synthetic.
-- Use invented people, companies, and notes.
+- Use invented product scenarios, roles, and notes only.
 - Keep all demo notes generic, fictional, and non-sensitive.
-- Avoid private company information.
-- Avoid real customer notes.
-- Avoid interview or recruiter content.
-- Avoid secrets, API keys, tokens, and credentials.
-- Do not include real people, real companies, real employers, private recruiter messages, Gitwit/Mechro details, copied customer notes, or private notes.
+- Do not include real people, real companies, real employers, private recruiter messages, Gitwit/Mechro details, copied customer notes, interview notes, secrets, API keys, tokens, or credentials.
+- Avoid industrial maintenance, equipment troubleshooting, machinery, manuals, manual search, parts search, technician copilots, CMMS, diagnostics, field service, PlantBrain, or Tenzin overlap.
 
-## Demo Project Concept
+## Demo Project
 
 Project: OnboardIQ.
 
 Concept: helping small B2B service teams turn messy customer onboarding notes into clear setup checklists.
 
-## Synthetic Design Partner Personas
+Demo marker:
 
-### Operations Lead
+- `isDemo: true`
+- `demoKey: "onboardiq"`
 
-Runs onboarding for a small B2B service company and needs fewer dropped setup details.
+These markers are required so reset can delete only known demo data.
 
-### Founder-Led Sales Owner
+## Seeded Notes
 
-Closes customers directly and wants handoff notes to become repeatable onboarding steps.
+The seed creates 3 synthetic design-partner notes:
 
-### Customer Success Generalist
+- operations lead at a small agency
+- customer success manager at a small SaaS company
+- founder of a boutique consulting firm
 
-Handles support and onboarding together and needs clearer priority across setup tasks.
+The notes include generic product-discovery signal:
 
-## Messy Sample Notes
+- onboarding pain
+- repeated follow-up messages
+- spreadsheet/checklist workarounds
+- unclear ownership
+- urgency and buying-trigger moments
+- one weak signal about staying with spreadsheets
+- pilot success criteria
 
-### Note 1
+## Seeded Extraction And Review State
 
-"Jordan said every new customer starts in a different place. Some send a long email, some send a spreadsheet, and some just mention requirements during sales calls. The team loses time figuring out what is still missing. Jordan wants a checklist that updates as they learn more."
+The seed creates deterministic mock extraction runs and insight records without calling real AI providers.
 
-### Note 2
+Seeded insight statuses include:
 
-"Priya said the painful part is not setup itself, it is chasing customers for the same missing details. They currently copy old onboarding docs and hope the new customer fits the same pattern. She would pay attention if the tool could show what is blocked and what question to ask next."
+- `accepted`
+- `edited`
+- `needs_follow_up`
+- `rejected`
+- `ai_generated`
 
-### Note 3
+The dashboard should be useful immediately after seeding: accepted and edited insights become primary signal, needs-follow-up insights remain unresolved, rejected insights are excluded from primary recommendation sections, and unreviewed AI-generated insights stay separate.
 
-"Marcus said his team does not need another project board. They need a way to turn call notes into a first draft onboarding plan. He worries AI will make confident guesses, so he wants every suggestion tied back to the note that caused it."
+## Demo Endpoints
 
-## Expected Extracted Signals
+- `POST /api/demo/seed`
+- `POST /api/demo/reset`
 
-- Persona: operations lead responsible for onboarding consistency.
-- User job: turn scattered customer setup details into a checklist.
-- Pain point: repeated follow-up for missing information.
-- Workaround: copying old onboarding docs.
-- Urgency signal: time lost before each customer can start.
-- Buying trigger: visibility into blocked setup items.
-- Risk: AI suggestions may be trusted without evidence.
-- Pilot success criteria: fewer missing setup details and faster first checklist creation.
-- Recommended experiment: generate a checklist draft from pasted onboarding notes.
+Both endpoints require:
 
-## Demo Reset Behavior
+- `DEMO_TOOLS_ENABLED=true`
+- `NODE_ENV` not equal to `production`
 
-The future reset action should remove existing local demo records and recreate the OnboardIQ project, notes, extraction run, and draft insights in a predictable state.
+If disabled, endpoints fail safely with a sanitized response.
 
-Demo reset must not require secrets, API keys, external provider calls, or network access. It should work with the mock AI provider and safe committed fixtures.
+## Reset Behavior
 
-Mock AI output should be safe to commit. Real AI-generated outputs should not be committed unless they were generated only from synthetic notes and reviewed for accidental sensitive content.
+Reset deletes only records tied to the marked OnboardIQ demo project. It does not wipe entire collections and does not delete arbitrary user-created projects, notes, extraction runs, or insights.
 
-## What Must Never Appear In Seed Data
+Seed runs reset first, then recreates a clean deterministic state. Re-running seed should not create duplicate demo projects.
 
-- Real customer names or notes.
-- Real people or real companies.
-- Real employers.
-- Private Gitwit or Mechro information.
-- Interview, recruiter, candidate, or private employer information.
-- Copied customer notes.
-- Secrets, API keys, tokens, or credentials.
-- Industrial, troubleshooting, or unrelated operational domain examples.
+## Provider And Secret Rules
+
+Demo reset must not require secrets, API keys, external provider calls, or network access. It should work with the mock extraction path and safe committed fixtures.
+
+Mock output and seeded records should be safe to commit. Real AI-generated outputs should not be committed unless generated only from synthetic notes and reviewed for accidental sensitive content.

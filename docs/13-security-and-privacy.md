@@ -118,10 +118,19 @@ Enterprise audit logging is out of MVP. Future event logging should record safe 
 - No real provider keys required.
 - No `.env` committed.
 - Debug output remains minimal by default.
+- Demo seed/reset tools are disabled unless explicitly enabled for local demo work.
+
+## Demo Seed/Reset Safety
+
+Demo tools are local-only and synthetic-only. `POST /api/demo/seed` and `POST /api/demo/reset` require `DEMO_TOOLS_ENABLED=true` and must be blocked when `NODE_ENV=production`.
+
+Reset must delete only marked demo records, currently `isDemo: true` and `demoKey: "onboardiq"`. It must not wipe entire collections or delete arbitrary user-created projects, notes, extraction runs, or insights.
+
+Demo seed must not call real AI providers, require provider keys, log raw seeded note text, or expose internal payloads/raw responses. Seeded records are synthetic but should still be treated as sensitive by design.
 
 ## Future Deployment Assumptions
 
-Before deployment with non-demo data, add authentication, authorization, rate limiting, managed secrets, production-safe logging, data retention decisions, and a review of raw provider-response persistence.
+Before deployment with non-demo data, add authentication, authorization, rate limiting, managed secrets, production-safe logging, data retention decisions, demo-tool production hardening/removal, and a review of raw provider-response persistence.
 
 ## Known MVP Security Tradeoffs
 
@@ -131,6 +140,7 @@ Before deployment with non-demo data, add authentication, authorization, rate li
 - No deployment secrets implementation in MVP.
 - No rate limiting in MVP.
 - Raw response persistence may exist only for local/debug and must be revisited before deployment.
+- Demo tooling is local-only and disabled by default.
 
 These are intentional tradeoffs because the MVP is local and synthetic-data-only.
 
@@ -147,3 +157,4 @@ These are intentional tradeoffs because the MVP is local and synthetic-data-only
 - Avoid logging raw notes, prompts, provider responses, or secrets.
 - Return sanitized errors to the frontend.
 - Do not expose raw provider responses or internal debug payloads by default.
+- Keep demo reset disabled by default and scoped only to marked synthetic demo data.

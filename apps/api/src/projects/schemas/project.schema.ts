@@ -25,9 +25,16 @@ export class Project {
   })
   status!: ProjectStatus;
 
+  @Prop({ default: false, type: Boolean })
+  isDemo!: boolean;
+
+  @Prop({ trim: true, maxlength: 80 })
+  demoKey?: string;
+
   createdAt!: Date;
 
   updatedAt!: Date;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+ProjectSchema.index({ demoKey: 1 });

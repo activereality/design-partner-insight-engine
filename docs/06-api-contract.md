@@ -225,8 +225,36 @@ Validation: dashboard reads must validate `projectId` and scope all queries by p
 
 Purpose: reset the local synthetic demo scenario.
 
-Response shape: seeded project summary.
+Response shape:
 
-MVP notes: safe local-only behavior. No real data should be present.
+```json
+{
+  "deletedProjects": 1,
+  "deletedNotes": 3,
+  "deletedExtractionRuns": 3,
+  "deletedInsights": 23
+}
+```
 
-Validation: reset behavior should not mix demo configuration with runtime provider configuration.
+MVP notes: safe local-only behavior. Demo tools require `DEMO_TOOLS_ENABLED=true` and non-production `NODE_ENV`. Reset must delete only records marked `isDemo: true` and `demoKey: "onboardiq"`.
+
+Validation: reset behavior should not mix demo configuration with runtime provider configuration. It must not wipe arbitrary projects, notes, runs, or insights.
+
+### `POST /api/demo/seed`
+
+Purpose: create the deterministic synthetic OnboardIQ demo workspace.
+
+Response shape:
+
+```json
+{
+  "projectId": "...",
+  "noteCount": 3,
+  "insightCount": 23,
+  "dashboardPath": "/projects/..."
+}
+```
+
+MVP notes: seed first resets only marked OnboardIQ demo data, then creates the synthetic project, notes, mock extraction runs, reviewed insights, and dashboard-ready signal. It must not call real AI providers or require provider keys.
+
+Validation: demo tools must be disabled by default, blocked in production, and synthetic-only.

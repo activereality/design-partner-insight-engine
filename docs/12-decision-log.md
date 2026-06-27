@@ -217,7 +217,7 @@ Consequences:
 - Mock `rawResponse` stores deterministic metadata only and does not store raw note text.
 - Generated insights are first persisted with `reviewStatus: ai_generated`; human review actions can later accept, reject, edit, or mark them as needing follow-up.
 - Insight API responses omit internal `payload`; evidence snippets remain potentially sensitive and should be handled carefully.
-- OpenAI provider integration and dashboard aggregation were deferred to later slices; Anthropic/Gemini providers, auth, and seed/reset remain deferred.
+- OpenAI provider integration, dashboard aggregation, and seed/reset were deferred to later slices; Anthropic/Gemini providers and auth remain deferred.
 
 ## ADR 029: Validate Extraction Output Before Persistence
 
@@ -247,7 +247,7 @@ Consequences:
 - Provider output is validated against `design_partner_extraction.v1` before persistence.
 - OpenAI keys, prompts, raw provider responses, provider errors, and internal debug payloads are not exposed to the frontend.
 - Normal extraction run responses omit full raw provider responses, and insight responses continue to omit internal `payload`.
-- Anthropic/Gemini providers, streaming, dashboard, auth, and seed/reset remain deferred.
+- Dashboard aggregation and seed/reset were deferred to later slices; Anthropic/Gemini providers, streaming, and auth remain deferred.
 
 ## ADR 031: Human Review Before Insight Acceptance
 
@@ -277,3 +277,41 @@ Consequences:
 - Decision recommendation buckets are derived server-side from persisted insight metadata and returned as safe DTOs.
 - Dashboard responses omit internal `payload`, extraction `rawResponse`, full note `rawText`, raw provider output, provider details, and secrets.
 - The dashboard remains a current-state view; historical snapshots, exports, audit logs, auth roles, and advanced analytics remain out of scope.
+
+## ADR 033: Demo Tools Are Gated And Local-Only
+
+Decision: require `DEMO_TOOLS_ENABLED=true` and non-production `NODE_ENV` before demo seed/reset endpoints run.
+
+Rationale: demo tooling is useful for interviews but should not become an accidental production data-loss surface.
+
+Consequences:
+
+- Demo endpoints are disabled by default.
+- Disabled demo endpoints fail safely without exposing internals.
+- `.env.example` documents the safe default, and `.env` remains uncommitted.
+- Demo tooling remains out of production scope until real auth/authorization and deployment controls exist.
+
+## ADR 034: Reset Deletes Only Marked OnboardIQ Demo Data
+
+Decision: mark the seeded project with `isDemo: true` and `demoKey: "onboardiq"`, and reset only records scoped to those marked demo projects.
+
+Rationale: reset should restore a predictable local demo without risking arbitrary user-created projects, notes, extraction runs, or insights.
+
+Consequences:
+
+- Re-running seed first removes the previous marked OnboardIQ demo records.
+- Reset does not wipe entire collections.
+- Project demo markers stay server-side implementation detail and are not needed for normal product workflows.
+
+## ADR 035: Seed Uses Synthetic OnboardIQ Data And Mock Extraction Only
+
+Decision: seed the demo with fictional OnboardIQ notes and deterministic mock extraction records, never real provider calls.
+
+Rationale: interview demos should work without secrets, network calls, provider keys, or private data.
+
+Consequences:
+
+- Seed creates 3 synthetic notes and a mix of accepted, edited, needs-follow-up, rejected, and AI-generated insights.
+- The dashboard is useful immediately after seed.
+- Seed data avoids real people, real companies, private notes, recruiter/interview content, Gitwit/Mechro details, and product-boundary drift.
+- OpenAI, Anthropic, Gemini, and other real providers are not called during demo seed/reset.
